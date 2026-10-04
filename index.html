@@ -1,435 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Split-Screen Call Center Racing</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First American League</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
-    :root {
-      --bg-color: #05010a;
-      --panel-bg: rgba(10, 5, 20, 0.9);
-      --ui-border: rgba(0, 240, 255, 0.4);
-    }
+  :root{
+    --bg:#08111f;
+    --bg2:#0c1728;
+    --panel:rgba(14,27,45,.88);
+    --panel-2:#101f34;
+    --line:rgba(164,187,214,.14);
+    --text:#f4f8ff;
+    --muted:#8fa4bd;
+    --cyan:#42e8ff;
+    --gold:#ffd45a;
+    --green:#59d88c;
+    --shadow:0 18px 50px rgba(0,0,0,.35);
+  }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Rajdhani', sans-serif;
-      user-select: none;
-    }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 20% 0%,rgba(42,115,170,.18),transparent 35%),radial-gradient(circle at 90% 15%,rgba(77,56,153,.16),transparent 32%),linear-gradient(160deg,var(--bg),#060d17);color:var(--text)}
+  body{padding:24px;overflow-x:hidden}
 
-    body {
-      background-color: var(--bg-color);
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden; /* Prevent scrolling, act like a game screen */
-    }
+  .app{max-width:1500px;margin:0 auto}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand-mark{width:50px;height:50px;border-radius:15px;background:linear-gradient(145deg,#16395a,#0c1c2d);border:1px solid rgba(66,232,255,.3);display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  .brand-mark span{font-size:24px}
+  h1{font-family:"Space Grotesk",sans-serif;font-size:clamp(22px,2.3vw,34px);margin:0;letter-spacing:-.03em}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:3px}
+  .top-stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .pill{padding:9px 12px;border:1px solid var(--line);background:rgba(9,20,34,.62);border-radius:999px;color:#cbd9e8;font-size:12px}
+  .pill strong{color:#fff;margin-left:5px}
 
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      height: 80px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-      z-index: 100;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-    }
+  .layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(310px,.72fr);gap:18px}
+  .panel{background:linear-gradient(145deg,rgba(18,35,57,.94),rgba(11,24,40,.88));border:1px solid rgba(167,192,221,.13);box-shadow:var(--shadow);border-radius:22px}
 
-    .title-area h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 900;
-      font-style: italic;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      background: linear-gradient(180deg, #fff 20%, #00f0ff 60%, #ff0077 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.4));
-    }
+  .race-card{padding:20px;position:relative;overflow:hidden}
+  .race-card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(110,145,178,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(110,145,178,.05) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,#000,transparent 88%);pointer-events:none}
+  .race-header{position:relative;display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:12px}
+  .race-header h2{font:700 18px "Space Grotesk";margin:0}
+  .race-header p{font-size:12px;color:var(--muted);margin:4px 0 0}
+  .leader-badge{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:12px;background:rgba(255,212,90,.08);border:1px solid rgba(255,212,90,.22);font-size:12px;color:#f6de8d}
+  .leader-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
 
-    .title-area p {
-      color: #e2b6ff;
-      font-size: 0.9rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
+  .track-head{display:grid;grid-template-columns:170px 1fr 68px;gap:12px;align-items:end;color:#839ab4;font-size:10px;text-transform:uppercase;letter-spacing:.12em;padding:0 10px 6px}
+  .scale{position:relative;height:18px}
+  .scale span{position:absolute;transform:translateX(-50%)}
+  .scale span:nth-child(1){left:0;transform:none}.scale span:nth-child(2){left:25%}.scale span:nth-child(3){left:50%}.scale span:nth-child(4){left:75%}.scale span:nth-child(5){left:100%}
+  .lanes{display:flex;flex-direction:column;gap:9px;position:relative}
+  .lane{display:grid;grid-template-columns:170px 1fr 68px;gap:12px;align-items:center;min-height:70px;padding:8px 10px;border-radius:16px;background:linear-gradient(180deg,rgba(10,24,40,.86),rgba(8,19,32,.78));border:1px solid rgba(160,190,220,.08);position:relative}
+  .lane:first-child{border-color:rgba(255,212,90,.18);box-shadow:inset 0 0 0 1px rgba(255,212,90,.04)}
+  .lane-meta{display:flex;align-items:center;gap:10px;min-width:0}
+  .rank{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#152942;color:#d7e4f3;font-weight:800;font-size:12px;flex:0 0 auto}
+  .rank.r1{background:rgba(255,212,90,.17);color:#ffd45a}.rank.r2{background:rgba(198,211,226,.12);color:#d6e2ef}.rank.r3{background:rgba(207,146,75,.13);color:#eab77f}
+  .team-dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 4px rgba(255,255,255,.03);flex:0 0 auto}
+  .team-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .status{font-size:10px;color:var(--muted);margin-top:3px}
+  .track{height:48px;position:relative;border-radius:13px;background:#07131f;border:1px solid rgba(169,194,220,.09);overflow:hidden}
+  .track:before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:repeating-linear-gradient(90deg,rgba(173,199,223,.10) 0 18px,transparent 18px 32px)}
+  .track:after{content:"";position:absolute;inset:8px 0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.03) 50%,transparent 100%);pointer-events:none}
+  .checkpoint{position:absolute;top:0;bottom:0;width:1px;background:rgba(165,189,214,.13)}
+  .checkpoint b{position:absolute;top:4px;left:5px;font-size:8px;color:#68809a;font-weight:500}
+  .checkpoint.c25{left:25%}.checkpoint.c50{left:50%}.checkpoint.c75{left:75%}.checkpoint.c100{right:0;background:rgba(66,232,255,.26)}
+  .progress{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,.02),var(--team) 85%);opacity:.34;transition:width 1.1s cubic-bezier(.2,.85,.18,1)}
+  .trail{position:absolute;top:50%;height:6px;transform:translateY(-50%);border-radius:999px;background:linear-gradient(90deg,transparent,var(--team));filter:blur(3px);opacity:.55;width:0;transition:width 1.1s cubic-bezier(.2,.85,.18,1)}
+  .car{position:absolute;top:50%;left:0;transform:translate(-50%,-54%);width:56px;height:28px;transition:left 1.1s cubic-bezier(.2,.85,.18,1);filter:drop-shadow(0 7px 8px rgba(0,0,0,.5))}
+  .car svg{width:100%;height:100%}
+  .score{font:800 17px "Space Grotesk";text-align:right}
+  .finish-flag{font-size:15px;margin-left:4px;vertical-align:2px}
 
-    .minimap-container {
-      width: 250px;
-      height: 70px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid var(--ui-border);
-      border-radius: 8px;
-      position: relative;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-      padding: 5px;
-    }
+  .standings{padding:20px}
+  .standings h2,.details h2{font:700 18px "Space Grotesk";margin:0}
+  .section-note{font-size:12px;color:var(--muted);margin:5px 0 15px}
+  .stand-row{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:11px 8px;border-radius:14px;margin-bottom:7px;border:1px solid transparent}
+  .stand-row.active{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.07)}
+  .stand-team{min-width:0}
+  .stand-team strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini-progress{height:5px;background:#172a40;border-radius:999px;overflow:hidden;margin-top:6px}
+  .mini-progress i{display:block;height:100%;border-radius:999px}
+  .stand-score{font:700 15px "Space Grotesk"}
 
-    .minimap-svg {
-      width: 100%;
-      height: 100%;
-    }
+  .details{margin-top:18px;padding:20px;min-height:230px;position:relative;overflow:hidden}
+  .detail-top{display:flex;justify-content:space-between;gap:14px;align-items:start}
+  .detail-team{display:flex;align-items:center;gap:10px}
+  .detail-team .big-dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,.03)}
+  .detail-title{font:700 16px "Space Grotesk";margin:0}
+  .detail-meta{font-size:11px;color:var(--muted);margin-top:3px}
+  .big-score{font:800 42px "Space Grotesk";line-height:1;text-align:right}
+  .big-score small{font-size:15px;color:var(--muted);font-weight:700}
+  .detail-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;margin-top:20px}
+  .score-meter{height:13px;background:#0a1828;border:1px solid rgba(167,191,218,.09);border-radius:99px;overflow:hidden}
+  .score-meter i{display:block;height:100%;border-radius:99px;width:0;transition:width 1.1s ease}
+  .meter-labels{display:flex;justify-content:space-between;margin-top:7px;font-size:10px;color:#6f879f}
+  .milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .milestone{padding:9px 8px;border-radius:12px;background:rgba(5,16,28,.58);border:1px solid rgba(159,188,216,.08);text-align:center}
+  .milestone b{display:block;font-size:12px}.milestone span{font-size:9px;color:#748ca4}
+  .milestone.done{border-color:rgba(89,216,140,.25);background:rgba(89,216,140,.06)}
+  .milestone.done b{color:var(--green)}
 
-    .map-dot {
-      transition: all 1s ease-out;
-      filter: drop-shadow(0 0 4px currentColor);
-    }
+  .footer{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;color:#71879d;font-size:10px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap}.legend span{display:flex;gap:5px;align-items:center}
+  .legend i{width:7px;height:7px;border-radius:50%;background:#51667e}.legend i.cyan{background:var(--cyan)}
 
-    .split-screen-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 4px;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      padding-top: 80px; /* Offset for header */
-    }
-
-    .player-screen {
-      position: relative;
-      background: #080214;
-      overflow: hidden;
-      border: 2px solid #222;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    /* Team-specific glow borders */
-    .player-screen::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      box-shadow: inset 0 0 40px var(--team-color);
-      opacity: 0.3;
-      pointer-events: none;
-      z-index: 20;
-    }
-
-    .scene-3d {
-      position: absolute;
-      bottom: -10%;
-      width: 100%;
-      height: 70%;
-      perspective: 400px;
-      display: flex;
-      justify-content: center;
-      z-index: 1;
-    }
-
-    .road {
-      width: 300%;
-      height: 200%;
-      position: absolute;
-      bottom: 0;
-      transform: rotateX(75deg);
-      transform-origin: bottom center;
-      /* Road texture with grid lines */
-      background: 
-        linear-gradient(90deg, rgba(255,255,255,0) 48%, rgba(255,255,255,0.8) 49%, rgba(255,255,255,0.8) 51%, rgba(255,255,255,0) 52%), /* Center Line */
-        linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(30,10,50,1) 100%);
-      background-size: 100px 100px, 100% 100%;
-      border-left: 15px solid var(--team-color);
-      border-right: 15px solid var(--team-color);
-      box-shadow: 0 0 50px var(--team-color);
-    }
-
-    /* Horizontal moving lines to create forward speed */
-    .road::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(to top, transparent, transparent 40px, rgba(0, 240, 255, 0.2) 42px, rgba(0, 240, 255, 0.2) 44px);
-      animation: drive 0.5s linear infinite;
-    }
-
-    @keyframes drive {
-      from { background-position: 0 0; }
-      to { background-position: 0 44px; }
-    }
-
-    .hud {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 10;
-      padding: 15px;
-      pointer-events: none;
-    }
-
-    .hud-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .rank-indicator {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: #ffd700;
-      text-shadow: 2px 2px 0 #000, 0 0 10px #ffd700;
-      -webkit-text-stroke: 1px #b8860b;
-    }
-
-    .rank-indicator span {
-      font-size: 1rem;
-      vertical-align: super;
-    }
-
-    .stats-panel {
-      background: rgba(0,0,0,0.6);
-      border: 1px solid var(--team-color);
-      padding: 5px 12px;
-      border-radius: 4px;
-      text-align: right;
-      backdrop-filter: blur(4px);
-    }
-
-    .team-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--team-color);
-      text-shadow: 0 0 5px var(--team-color);
-      text-transform: uppercase;
-    }
-
-    .score-text {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: #fff;
-    }
-
-    .kart-wrapper {
-      position: absolute;
-      bottom: 15px;
-      z-index: 5;
-      animation: hover 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes hover {
-      0% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-4px) rotate(1deg); }
-      100% { transform: translateY(0px) rotate(-1deg); }
-    }
-
-    .kart-svg {
-      width: 140px;
-      height: 90px;
-      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.8));
-    }
-  </style>
+  @media (max-width: 1050px){
+    body{padding:14px}.layout{grid-template-columns:1fr}.standings{order:2}.details{order:3}
+  }
+  @media (max-width: 700px){
+    .topbar{align-items:flex-start}.top-stats{display:none}
+    .track-head,.lane{grid-template-columns:115px 1fr 50px;gap:7px}
+    .track-head{padding-left:5px}.lane{padding:7px 6px}.team-name{font-size:11px}.status{font-size:9px}
+    .rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}
+    .car{width:49px}.score{font-size:14px}
+    .detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
 </head>
 <body>
-
-  <header class="dashboard-header">
-    <div class="title-area">
-      <h1>⚡ Grand Prix Dashboard ⚡</h1>
-      <p>Live CSAT / Performance Circuit</p>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><span>🏁</span></div>
+      <div>
+        <h1>First American League</h1>
+        <div class="subtitle">A performance race where improvement becomes visible progress.</div>
+      </div>
     </div>
-    
-    <div class="minimap-container">
-      <svg class="minimap-svg" viewBox="0 0 250 70">
-        <!-- Circuit Path -->
-        <path id="circuit-track" 
-              d="M 35 35 L 215 35" 
-              fill="none" 
-              stroke="rgba(255,255,255,0.2)" 
-              stroke-width="15" 
-              stroke-linecap="round" />
-        <path id="circuit-highlight" 
-              d="M 35 35 L 215 35" 
-              fill="none" 
-              stroke="rgba(0, 240, 255, 0.5)" 
-              stroke-width="2" 
-              stroke-dasharray="5,5" 
-              stroke-linecap="round" />
-        
-        <!-- Minimap Dots will be injected here via JS -->
-        <g id="minimap-dots"></g>
-        
-        <!-- Start/Finish flags -->
-        <text x="15" y="40" fill="#fff" font-size="14">🏁</text>
-      </svg>
+    <div class="top-stats">
+      <div class="pill">Season <strong id="seasonLabel">01</strong></div>
+      <div class="pill">Updated <strong id="updatedLabel">—</strong></div>
+      <div class="pill">Leader <strong id="leaderLabel">—</strong></div>
     </div>
   </header>
 
-  <div class="split-screen-grid" id="split-screen-grid">
-    <!-- Player screens will be generated here -->
-  </div>
+  <main class="layout">
+    <section class="panel race-card">
+      <div class="race-header">
+        <div>
+          <h2>Championship Circuit</h2>
+          <p>Every 25% is a checkpoint. 100% is the finish line.</p>
+        </div>
+        <div class="leader-badge"><span class="leader-dot"></span><span id="leaderBadge">Loading standings…</span></div>
+      </div>
 
-  <script>
-    // Fallback data in case data.json doesn't exist yet or fails to load
-    const dummyData = {
-      "teams": [
-        { "name": "Team Delta", "color": "#ffb800", "score": 91 },
-        { "name": "Team Alpha", "color": "#ff0055", "score": 82 },
-        { "name": "Team Bravo", "color": "#0066ff", "score": 65 },
-        { "name": "Team Foxtrot", "color": "#00ff66", "score": 58 },
-        { "name": "Team Charlie", "color": "#00f0ff", "score": 45 },
-        { "name": "Team Echo", "color": "#b800ff", "score": 30 }
-      ]
-    };
+      <div class="track-head">
+        <div>Teams</div>
+        <div class="scale">
+          <span>Start</span><span>25%</span><span>50%</span><span>75%</span><span>Finish</span>
+        </div>
+        <div style="text-align:right">Score</div>
+      </div>
+      <div id="lanes" class="lanes"></div>
 
-    const gridContainer = document.getElementById('split-screen-grid');
-    const minimapDotsContainer = document.getElementById('minimap-dots');
-    
-    // Get path details for minimap calculations
-    const circuitPath = document.getElementById('circuit-track');
-    const pathLength = circuitPath.getTotalLength();
+      <div class="footer">
+        <div class="legend">
+          <span><i class="cyan"></i> Live position</span>
+          <span><i></i> Checkpoint</span>
+        </div>
+        <div>Scores are loaded from <code>data.json</code></div>
+      </div>
+    </section>
 
-    function getKartSVG(color) {
-      return `
-        <svg class="kart-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-          <!-- Exhaust Pipes -->
-          <rect x="60" y="80" width="15" height="15" fill="#333" rx="3"/>
-          <rect x="125" y="80" width="15" height="15" fill="#333" rx="3"/>
-          <!-- Exhaust Flames -->
-          <path d="M67 95 Q 67 110 60 115 Q 75 110 75 95 Z" fill="#00f0ff" opacity="0.8">
-            <animate attributeName="opacity" values="0.4;1;0.4" dur="0.2s" repeatCount="indefinite"/>
-          </path>
-          <path d="M132 95 Q 132 110 125 115 Q 140 110 140 95 Z" fill="#00f0ff" opacity="0.8">
-            <animate attributeName="opacity" values="0.4;1;0.4" dur="0.2s" repeatCount="indefinite"/>
-          </path>
-          
-          <!-- Rear Tires -->
-          <rect x="20" y="50" width="35" height="55" fill="#111" rx="8" stroke="#222" stroke-width="2"/>
-          <rect x="145" y="50" width="35" height="55" fill="#111" rx="8" stroke="#222" stroke-width="2"/>
-          <!-- Tire Treads -->
-          <line x1="25" y1="60" x2="50" y2="60" stroke="#000" stroke-width="3"/>
-          <line x1="25" y1="75" x2="50" y2="75" stroke="#000" stroke-width="3"/>
-          <line x1="25" y1="90" x2="50" y2="90" stroke="#000" stroke-width="3"/>
-          <line x1="150" y1="60" x2="175" y2="60" stroke="#000" stroke-width="3"/>
-          <line x1="150" y1="75" x2="175" y2="75" stroke="#000" stroke-width="3"/>
-          <line x1="150" y1="90" x2="175" y2="90" stroke="#000" stroke-width="3"/>
+    <aside class="panel standings">
+      <h2>Standings</h2>
+      <div class="section-note">Rank is determined by the overall performance score.</div>
+      <div id="standingList"></div>
+    </aside>
+  </main>
 
-          <!-- Spoiler -->
-          <path d="M35 30 L165 30 L175 40 L25 40 Z" fill="${color}"/>
-          <rect x="60" y="40" width="10" height="20" fill="#222"/>
-          <rect x="130" y="40" width="10" height="20" fill="#222"/>
+  <section class="panel details" id="details">
+    <div class="detail-top">
+      <div>
+        <div class="detail-team">
+          <span class="big-dot" id="detailDot"></span>
+          <div>
+            <h2 class="detail-title" id="detailName">Select a team</h2>
+            <div class="detail-meta" id="detailMeta">Click any lane or standing row to inspect the race status.</div>
+          </div>
+        </div>
+      </div>
+      <div class="big-score"><span id="detailScore">—</span><small>%</small></div>
+    </div>
 
-          <!-- Main Chassis Body (Rear View) -->
-          <path d="M45 55 Q 100 45 155 55 L 165 85 L 35 85 Z" fill="${color}"/>
-          
-          <!-- Driver Helmet (Simple sphere) -->
-          <circle cx="100" cy="40" r="18" fill="#fff" stroke="#ccc" stroke-width="2"/>
-          <!-- Helmet Visor -->
-          <path d="M85 38 Q 100 45 115 38 L 115 45 Q 100 52 85 45 Z" fill="#111"/>
-          
-          <!-- Tail Lights -->
-          <rect x="50" y="65" width="25" height="8" fill="#ff0000" rx="3" filter="drop-shadow(0 0 5px #ff0000)"/>
-          <rect x="125" y="65" width="25" height="8" fill="#ff0000" rx="3" filter="drop-shadow(0 0 5px #ff0000)"/>
-        </svg>
+    <div class="detail-grid">
+      <div>
+        <div class="score-meter"><i id="detailMeter"></i></div>
+        <div class="meter-labels"><span>0% Start</span><span>100% Finish</span></div>
+      </div>
+      <div class="milestones">
+        <div class="milestone" id="m25"><b>25%</b><span>Checkpoint 1</span></div>
+        <div class="milestone" id="m50"><b>50%</b><span>Midway</span></div>
+        <div class="milestone" id="m75"><b>75%</b><span>Sprint</span></div>
+        <div class="milestone" id="m100"><b>100%</b><span>Finish</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const fallbackData = {
+    lastUpdated: new Date().toISOString().slice(0,10),
+    teams: [
+      {id:1,name:"Team Alpha",color:"#E63946",score:82},
+      {id:2,name:"Team Bravo",color:"#1D3557",score:65},
+      {id:3,name:"Team Charlie",color:"#2A9D8F",score:45},
+      {id:4,name:"Team Delta",color:"#F4A261",score:91},
+      {id:5,name:"Team Echo",color:"#9C27B0",score:30},
+      {id:6,name:"Team Foxtrot",color:"#4CAF50",score:58}
+    ]
+  };
+
+  let teams = [];
+  let selectedId = null;
+
+  function clamp(n,min,max){ return Math.min(Math.max(Number(n)||0,min),max); }
+
+  function statusFor(score, rank){
+    if(score >= 90) return "Final stretch";
+    if(score >= 75) return "Podium push";
+    if(score >= 50) return "Midfield battle";
+    if(score >= 25) return "Building momentum";
+    return "Warm-up lap";
+  }
+
+  function carSVG(color){
+    return `
+      <svg viewBox="0 0 120 56" aria-hidden="true">
+        <defs>
+          <linearGradient id="g-${color.replace('#','')}" x1="0" x2="1">
+            <stop offset="0" stop-color="${color}" stop-opacity=".72"/>
+            <stop offset="1" stop-color="${color}"/>
+          </linearGradient>
+        </defs>
+        <path d="M18 35 L27 25 Q34 18 48 17 L78 17 Q87 18 94 25 L104 29 L108 36 L100 38 L20 38 Z" fill="url(#g-${color.replace('#','')})"/>
+        <path d="M45 18 L55 10 L79 10 L88 19 Z" fill="${color}" opacity=".92"/>
+        <path d="M56 12 L76 12 L81 18 L50 18 Z" fill="#0d1b29" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+        <circle cx="33" cy="39" r="8" fill="#07101a" stroke="#a9bfd5" stroke-width="2"/>
+        <circle cx="91" cy="39" r="8" fill="#07101a" stroke="#a9bfd5" stroke-width="2"/>
+        <circle cx="33" cy="39" r="3" fill="#6d8195"/><circle cx="91" cy="39" r="3" fill="#6d8195"/>
+        <rect x="13" y="31" width="12" height="3" rx="1.5" fill="#e9f5ff" opacity=".55"/>
+        <path d="M103 28 L116 32 L116 34 L106 34 Z" fill="${color}"/>
+      </svg>`;
+  }
+
+  async function loadData(){
+    try{
+      const r = await fetch('data.json?cb=' + Date.now(), {cache:'no-store'});
+      if(!r.ok) throw new Error('Could not load data.json');
+      return await r.json();
+    }catch(err){
+      console.warn(err);
+      return fallbackData;
+    }
+  }
+
+  function render(data){
+    teams = (data.teams || [])
+      .map(t => ({...t, score: clamp(t.score,0,100)}))
+      .sort((a,b) => b.score - a.score);
+
+    const lanes = document.getElementById('lanes');
+    const standings = document.getElementById('standingList');
+    lanes.innerHTML = '';
+    standings.innerHTML = '';
+
+    if(selectedId === null || !teams.some(t => t.id === selectedId)){
+      selectedId = teams[0]?.id ?? null;
+    }
+
+    document.getElementById('updatedLabel').textContent = data.lastUpdated || '—';
+    document.getElementById('leaderLabel').textContent = teams[0]?.name?.replace('Team ','') || '—';
+    document.getElementById('leaderBadge').textContent = teams[0] ? `${teams[0].name} leads at ${teams[0].score}%` : 'No teams';
+
+    teams.forEach((team,index)=>{
+      const rank=index+1;
+      const row=document.createElement('div');
+      row.className='lane';
+      row.dataset.id=team.id;
+      row.style.setProperty('--team', team.color);
+      row.innerHTML=`
+        <div class="lane-meta">
+          <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
+          <span class="team-dot" style="background:${team.color}"></span>
+          <div>
+            <div class="team-name">${team.name}</div>
+            <div class="status">${statusFor(team.score,rank)}</div>
+          </div>
+        </div>
+        <div class="track">
+          <div class="checkpoint c25"><b>25</b></div>
+          <div class="checkpoint c50"><b>50</b></div>
+          <div class="checkpoint c75"><b>75</b></div>
+          <div class="checkpoint c100"><b>100</b></div>
+          <div class="progress" id="p-${team.id}"></div>
+          <div class="trail" id="t-${team.id}"></div>
+          <div class="car" id="c-${team.id}">${carSVG(team.color)}</div>
+        </div>
+        <div class="score">${team.score}%${team.score>=100?'<span class="finish-flag">🏁</span>':''}</div>
       `;
-    }
+      row.addEventListener('click',()=>selectTeam(team.id));
+      lanes.appendChild(row);
 
-    function getRankSuffix(rank) {
-      if (rank === 1) return 'st';
-      if (rank === 2) return 'nd';
-      if (rank === 3) return 'rd';
-      return 'th';
-    }
+      const srow=document.createElement('div');
+      srow.className='stand-row' + (selectedId===team.id?' active':'');
+      srow.dataset.id=team.id;
+      srow.innerHTML=`
+        <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
+        <div class="stand-team">
+          <strong>${team.name}</strong>
+          <div class="mini-progress"><i style="width:${team.score}%;background:${team.color}"></i></div>
+        </div>
+        <div class="stand-score">${team.score}%</div>
+      `;
+      srow.addEventListener('click',()=>selectTeam(team.id));
+      standings.appendChild(srow);
 
-    async function initDashboard() {
-      let data = dummyData;
-
-      try {
-        // Try fetching actual data.json
-        const response = await fetch('data.json?cachebust=' + new Date().getTime());
-        if (response.ok) {
-          data = await response.json();
-        } else {
-          console.warn("data.json not found, using dummy data.");
-        }
-      } catch (error) {
-        console.warn("Error fetching data.json, using dummy data.", error);
-      }
-
-      // Sort teams to determine ranks
-      const sortedTeams = [...data.teams].sort((a, b) => b.score - a.score);
-      
-      gridContainer.innerHTML = '';
-      minimapDotsContainer.innerHTML = '';
-
-      sortedTeams.forEach((team, index) => {
-        const rank = index + 1;
-        const score = Math.min(Math.max(team.score, 0), 100);
-        const rankSuffix = getRankSuffix(rank);
-
-        const screen = document.createElement('div');
-        screen.className = 'player-screen';
-        screen.style.setProperty('--team-color', team.color);
-
-        // We alter the road animation speed slightly based on rank to make it dynamic
-        // 1st place road moves faster
-        const animationDuration = 0.3 + (rank * 0.05);
-
-        screen.innerHTML = `
-          <div class="hud">
-            <div class="hud-top">
-              <div class="rank-indicator">${rank}<span>${rankSuffix}</span></div>
-              <div class="stats-panel">
-                <div class="team-name">${team.name}</div>
-                <div class="score-text">CSAT: ${score}%</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="scene-3d">
-            <div class="road" style="animation-duration: ${animationDuration}s;"></div>
-          </div>
-          
-          <div class="kart-wrapper">
-            ${getKartSVG(team.color)}
-          </div>
-        `;
-        gridContainer.appendChild(screen);
-
-        // Calculate position along the horizontal straight line of our minimap
-        // The path goes from x=35 to x=215 (total length 180)
-        const pathLength = 180;
-        const positionX = 35 + (pathLength * (score / 100));
-        
-        // Add dot to SVG
-        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        dot.setAttribute("cx", positionX);
-        dot.setAttribute("cy", 35);
-        dot.setAttribute("r", "5");
-        dot.setAttribute("fill", team.color);
-        dot.setAttribute("class", "map-dot");
-        
-        // Add a pulsing halo ring
-        const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        halo.setAttribute("cx", positionX);
-        halo.setAttribute("cy", 35);
-        halo.setAttribute("r", "8");
-        halo.setAttribute("fill", "none");
-        halo.setAttribute("stroke", team.color);
-        halo.setAttribute("stroke-width", "1");
-        halo.setAttribute("opacity", "0.5");
-        
-        minimapDotsContainer.appendChild(halo);
-        minimapDotsContainer.appendChild(dot);
+      requestAnimationFrame(()=>{
+        const p=document.getElementById(`p-${team.id}`);
+        const t=document.getElementById(`t-${team.id}`);
+        const c=document.getElementById(`c-${team.id}`);
+        if(p) p.style.width=team.score+'%';
+        if(t) t.style.width=Math.max(team.score-3,0)+'%';
+        if(c) c.style.left=`calc(${team.score}% + ${team.score === 0 ? 0 : 0}px)`;
       });
-    }
+    });
 
-    // Initialize on load
-    window.onload = initDashboard;
-  </script>
+    updateSelectedDetails();
+  }
+
+  function selectTeam(id){
+    selectedId=id;
+    renderSelectionOnly();
+    document.getElementById('details').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function renderSelectionOnly(){
+    document.querySelectorAll('.stand-row').forEach(row=>{
+      row.classList.toggle('active', Number(row.dataset.id)===selectedId);
+    });
+    updateSelectedDetails();
+  }
+
+  function updateSelectedDetails(){
+    const team=teams.find(t=>t.id===selectedId);
+    if(!team) return;
+    const rank=teams.findIndex(t=>t.id===selectedId)+1;
+    document.getElementById('detailName').textContent=team.name;
+    document.getElementById('detailMeta').textContent=`${statusFor(team.score,rank)} · currently ${rank}${rank===1?'st':rank===2?'nd':rank===3?'rd':'th'} in the league`;
+    document.getElementById('detailScore').textContent=team.score;
+    document.getElementById('detailDot').style.background=team.color;
+    document.getElementById('detailDot').style.boxShadow=`0 0 0 6px ${team.color}18`;
+    const meter=document.getElementById('detailMeter');
+    meter.style.background=`linear-gradient(90deg,${team.color},${team.color}99)`;
+    requestAnimationFrame(()=>meter.style.width=team.score+'%');
+    [25,50,75,100].forEach(m=>{
+      document.getElementById('m'+m).classList.toggle('done',team.score>=m);
+    });
+  }
+
+  async function init(){
+    const data=await loadData();
+    render(data);
+  }
+
+  init();
+  setInterval(async()=>{
+    const data=await loadData();
+    render(data);
+  }, 30000);
+</script>
 </body>
 </html>
