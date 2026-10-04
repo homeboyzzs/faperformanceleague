@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>First American - Performance Championship</title>
+  <title>3D Sonic Racing - Call Center Championship</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&display=swap');
 
@@ -15,20 +15,20 @@
     }
 
     body {
-      background: #080214 radial-gradient(circle at 50% 20%, #1e0938 0%, #080214 80%);
+      background: #05010a radial-gradient(circle at 50% 10%, #1e0938 0%, #05010a 90%);
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 25px 15px;
+      padding: 20px 15px;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
     header {
       text-align: center;
-      margin-bottom: 25px;
-      position: relative;
+      margin-bottom: 0px; /* Reduced to bring board up */
+      z-index: 10;
     }
 
     h1 {
@@ -54,23 +54,37 @@
       text-shadow: 0 0 8px rgba(226, 182, 255, 0.5);
     }
 
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
+    /* 3D Scene Setup */
+    .scene {
       width: 100%;
       max-width: 1150px;
+      perspective: 1000px; /* This creates the 3D depth */
+      margin-top: 20px;
+      margin-bottom: 40px;
     }
 
-    /* Track Container */
+    /* Track Container tilted backwards */
     .track-container {
-      background: rgba(18, 10, 36, 0.85);
-      border: 2px solid #ff0077;
+      background: rgba(18, 10, 36, 0.95);
+      border: 3px solid #ff0077;
       border-radius: 16px;
-      padding: 25px 20px;
-      box-shadow: 0 0 30px rgba(255, 0, 119, 0.3), inset 0 0 20px rgba(0, 240, 255, 0.15);
-      backdrop-filter: blur(10px);
-      position: relative;
+      padding: 30px 20px 40px 20px;
+      box-shadow: 0 30px 60px rgba(255, 0, 119, 0.4), inset 0 0 40px rgba(0, 240, 255, 0.2);
+      transform: rotateX(45deg); /* Tilts the board */
+      transform-style: preserve-3d; /* Allows children to be 3D */
+    }
+
+    /* Grid pattern on the floor to enhance 3D effect */
+    .track-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+      border-radius: 12px;
+      pointer-events: none;
     }
 
     /* Distance Markers */
@@ -80,53 +94,60 @@
       margin-left: 155px;
       margin-right: 40px;
       padding-bottom: 12px;
-      border-bottom: 2px dashed rgba(0, 240, 255, 0.3);
       font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
+      font-size: 14px;
       color: #00f0ff;
       letter-spacing: 1px;
       text-shadow: 0 0 5px rgba(0,240,255,0.8);
+      transform: translateZ(1px); /* Keep slightly above board */
     }
 
     /* Individual Lane */
     .lane {
       display: flex;
       align-items: center;
-      height: 70px;
-      margin-top: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      height: 85px;
+      margin-top: 5px;
       position: relative;
+      transform-style: preserve-3d;
     }
 
-    .lane:last-child {
-      border-bottom: none;
+    /* Glowing divider lines on the floor */
+    .lane::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 160px; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,0,119,0.5), transparent);
+      box-shadow: 0 0 10px rgba(255,0,119,0.8);
     }
 
     .team-label {
       width: 150px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
       color: #fff;
-      text-shadow: 0 0 8px rgba(255,255,255,0.5);
+      transform: translateZ(10px) rotateX(-45deg); /* Counter-rotate to stand upright */
+      transform-origin: bottom center;
+      text-shadow: 0 5px 10px rgba(0,0,0,0.8);
     }
 
-    /* Golden Ring Rank Badge */
     .ring-badge {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       background: radial-gradient(circle, #fff7a0 20%, #ffd700 60%, #b8860b 100%);
       border: 2px solid #fff;
-      box-shadow: 0 0 10px #ffd700;
+      box-shadow: 0 0 15px #ffd700;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Orbitron', sans-serif;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 900;
       color: #3d2400;
     }
@@ -134,79 +155,91 @@
     /* Track Asphalt */
     .track {
       flex: 1;
-      height: 48px;
+      height: 55px;
       position: relative;
-      background: repeating-linear-gradient(90deg, #120924 0px, #120924 40px, #1c0e38 40px, #1c0e38 80px);
+      background: rgba(0, 0, 0, 0.6);
       margin: 0 10px;
       border-radius: 8px;
-      border: 1px solid rgba(0, 240, 255, 0.2);
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-      overflow: hidden;
+      border-top: 1px solid rgba(0, 240, 255, 0.3);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+      box-shadow: inset 0 0 15px rgba(0,0,0,1);
+      transform-style: preserve-3d;
     }
 
-    /* Finish Line Ring Gate */
+    /* 3D Finish Line Gate */
     .finish-gate {
       position: absolute;
       right: 0;
-      top: 0;
-      bottom: 0;
-      width: 18px;
-      background: linear-gradient(180deg, #00f0ff, #ff0077, #ffd700);
-      box-shadow: 0 0 15px #00f0ff, 0 0 25px #ff0077;
-      z-index: 1;
+      top: -20px;
+      bottom: -20px;
+      width: 10px;
+      background: linear-gradient(180deg, #00f0ff, #ffd700);
+      box-shadow: 0 0 20px #00f0ff, 0 0 40px #ff0077;
+      transform: rotateY(-90deg) translateZ(5px);
+      transform-origin: right center;
     }
 
-    /* Car Wrapper */
-    .car-wrapper {
+    /* Car Positioning Wrapper (Slides left to right) */
+    .car-positioner {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      left: 0%;
-      transition: left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      align-items: center;
-      z-index: 2;
+      transition: left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-style: preserve-3d;
+      z-index: 5;
     }
 
-    /* Light Trail Behind Car */
-    .car-trail {
+    /* Car Sprite (Counter-rotates to stand up in 3D) */
+    .car-sprite {
+      transform: rotateX(-45deg) translateZ(15px); /* Stands up and hovers slightly */
+      transform-origin: bottom center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Fake shadow on the 3D floor directly under the car */
+    .car-shadow {
       position: absolute;
-      right: 45px;
-      height: 6px;
-      width: 80px;
-      border-radius: 3px;
-      opacity: 0.8;
-      filter: blur(2px);
-      pointer-events: none;
+      width: 70px;
+      height: 20px;
+      background: rgba(0,0,0,0.8);
+      border-radius: 50%;
+      top: 15px;
+      left: -5px;
+      filter: blur(5px);
+      transform: translateZ(1px); /* Flat on the floor */
     }
 
     .car-svg {
-      width: 58px;
-      height: 28px;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+      width: 70px;
+      height: 35px;
+      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.5)); /* Adds depth to the standing sprite */
     }
 
     .car-score-tooltip {
       position: absolute;
-      top: -22px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: -30px;
       background: #ffd700;
       color: #000;
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
-      font-size: 11px;
-      padding: 2px 7px;
+      font-size: 13px;
+      padding: 3px 8px;
       border-radius: 4px;
-      box-shadow: 0 0 10px #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
       white-space: nowrap;
     }
 
-    /* Leader Cards Bottom */
+    /* Leader Cards Bottom (Kept flat for UI readability) */
     .podium-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 15px;
+      width: 100%;
+      max-width: 1150px;
+      z-index: 10;
     }
 
     .card {
@@ -215,7 +248,7 @@
       padding: 15px;
       border-radius: 12px;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
       position: relative;
       overflow: hidden;
     }
@@ -224,14 +257,14 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
+      height: 4px;
       background: var(--team-color);
-      box-shadow: 0 0 10px var(--team-color);
+      box-shadow: 0 0 15px var(--team-color);
     }
 
     .card .team-name {
       font-family: 'Orbitron', sans-serif;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       color: #a0aec0;
       margin-bottom: 6px;
@@ -239,34 +272,34 @@
 
     .card .team-score {
       font-family: 'Orbitron', sans-serif;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
       color: #00f0ff;
-      text-shadow: 0 0 10px rgba(0,240,255,0.6);
+      text-shadow: 0 0 15px rgba(0,240,255,0.6);
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>⚡ First American Team Racing ⚡</h1>
-    <p class="subtitle">Performance League</p>
+    <h1>⚡ Sonic Team Racing ⚡</h1>
+    <p class="subtitle">3D Performance Arena</p>
   </header>
 
-  <div class="main-container">
+  <div class="scene">
     <div class="track-container">
       <div class="distance-markers">
         <span>START (0%)</span>
         <span>25%</span>
         <span>50%</span>
         <span>75%</span>
-        <span>⚡ OVERDRIVE (100%)</span>
+        <span>🏁 100%</span>
       </div>
       <div id="lanes-list">Loading race tracks...</div>
     </div>
-
-    <div class="podium-cards" id="podium-cards"></div>
   </div>
+
+  <div class="podium-cards" id="podium-cards"></div>
 
   <script>
     const lanesList = document.getElementById('lanes-list');
@@ -276,18 +309,14 @@
     function getSonicCarSVG(color) {
       return `
         <svg class="car-svg" viewBox="0 0 120 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Main Chassis -->
           <path d="M5 32 L20 18 L55 12 L90 20 L115 30 L118 36 L5 38 Z" fill="${color}" />
-          <!-- Neon Accents & Windshield -->
-          <path d="M40 18 L70 18 L85 24 L35 24 Z" fill="#00f0ff" opacity="0.8" />
+          <path d="M40 18 L70 18 L85 24 L35 24 Z" fill="#00f0ff" opacity="0.9" />
           <path d="M15 32 L110 32" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
-          <!-- Rear Spoiler -->
           <path d="M2 22 L18 22 L15 28 L0 28 Z" fill="${color}" />
           <rect x="5" y="28" width="4" height="6" fill="#111" />
-          <!-- Wheels -->
-          <circle cx="30" cy="38" r="9" fill="#111" stroke="#00f0ff" stroke-width="2"/>
+          <circle cx="30" cy="38" r="10" fill="#111" stroke="#00f0ff" stroke-width="2"/>
           <circle cx="30" cy="38" r="4" fill="#fff" />
-          <circle cx="92" cy="38" r="9" fill="#111" stroke="#00f0ff" stroke-width="2"/>
+          <circle cx="92" cy="38" r="10" fill="#111" stroke="#00f0ff" stroke-width="2"/>
           <circle cx="92" cy="38" r="4" fill="#fff" />
         </svg>
       `;
@@ -298,7 +327,6 @@
         const response = await fetch('data.json?cachebust=' + new Date().getTime());
         const data = await response.json();
 
-        // Sort teams by score (highest rank first)
         const sortedTeams = [...data.teams].sort((a, b) => b.score - a.score);
 
         lanesList.innerHTML = '';
@@ -308,7 +336,7 @@
           const rank = index + 1;
           const score = Math.min(Math.max(team.score, 0), 100);
 
-          // Build Race Lane
+          // Build 3D Race Lane
           const lane = document.createElement('div');
           lane.className = 'lane';
           lane.innerHTML = `
@@ -318,16 +346,20 @@
             </div>
             <div class="track">
               <div class="finish-gate"></div>
-              <div class="car-wrapper" style="left: calc(${score}% - ${score > 88 ? '55px' : '0px'});">
-                <div class="car-trail" style="background: linear-gradient(90deg, transparent, ${team.color});"></div>
-                <div class="car-score-tooltip">${score}%</div>
-                ${getSonicCarSVG(team.color)}
+              
+              <div class="car-positioner" style="left: calc(${score}% - ${score > 88 ? '65px' : '0px'});">
+                <div class="car-shadow"></div>
+                <div class="car-sprite">
+                  <div class="car-score-tooltip">${score}%</div>
+                  ${getSonicCarSVG(team.color)}
+                </div>
               </div>
+
             </div>
           `;
           lanesList.appendChild(lane);
 
-          // Build Quick Stat Card
+          // Build Flat UI Card
           const card = document.createElement('div');
           card.className = 'card';
           card.style.setProperty('--team-color', team.color);
