@@ -124,7 +124,7 @@
       <div class="brand-mark"><span>🏁</span></div>
       <div>
         <h1>First American League</h1>
-        <div class="subtitle">CSAT leads the scoring. QA and AHT decide how far each team races.</div>
+        <div class="subtitle">CSAT leads the scoring. QA and AHT help each team reach the account targets.</div>
       </div>
     </div>
     <div class="top-stats">
@@ -156,6 +156,7 @@
         <div class="legend">
           <span><i class="cyan"></i> Live position</span>
           <span><i></i> Checkpoint</span>
+          <span><i style="background:#59d88c"></i> Target achieved</span>
         </div>
         <div>Scores are calculated from <code>data.json</code></div>
       </div>
@@ -196,7 +197,7 @@
             <div class="milestone" id="m100"><b>100%</b><span>Finish</span></div>
           </div>
           <div class="formula">Performance = <strong>CSAT × 40%</strong> + <strong>QA × 30%</strong> + <strong>AHT Score × 30%</strong></div>
-          <div class="config-note" id="ahtNote">AHT is reverse-scored: meeting the target earns 100 AHT points.</div>
+          <div class="config-note" id="targetNote">Target scoring: reaching the account target earns 100 points for that metric; results below target are scaled proportionally.</div>
         </div>
       </div>
 
@@ -214,7 +215,7 @@
     lastUpdated: new Date().toISOString().slice(0,10),
     settings: {
       weights: { csat: 0.40, qa: 0.30, aht: 0.30 },
-      aht: { targetSeconds: 600, scoringMethod: "target_ratio" }
+      targets: { csat: 64, qa: 90, ahtSeconds: 735 }
     },
     teams: [
       {id:1,name:"Team Alpha",color:"#E63946",metrics:{csat:87,qa:82,ahtSeconds:780}},
@@ -258,15 +259,82 @@
 
   function metricScore(team, key){
     const m = team.metrics || {};
-    if(key === 'csat') return clamp(m.csat,0,100);
-    if(key === 'qa') return clamp(m.qa,0,100);
+    const targets = config.targets || {csat:64, qa:90, ahtSeconds:735};
+
+    if(key === 'csat'){
+      const actual = Number(m.csat);
+      const target = Math.max(0.01, Number(targets.csat) || 1);
+      if(!Number.isFinite(actual) || actual < 0) return 0;
+      return clamp((actual / target) * 100, 0, 100);
+    }
+
+    if(key === 'qa'){
+      const actual = Number(m.qa);
+      const target = Math.max(0.01, Number(targets.qa) || 1);
+      if(!Number.isFinite(actual) || actual < 0) return 0;
+      return clamp((actual / target) * 100, 0, 100);
+    }
+
     if(key === 'aht'){
       const actual = Number(m.ahtSeconds);
-      const target = Math.max(1, Number(config.aht?.targetSeconds) || 1);
+      const target = Math.max(1, Number(targets.ahtSeconds) || 1);
       if(!Number.isFinite(actual) || actual <= 0) return 0;
-      return clamp((target / actual) * 100,0,100);
+      // Lower AHT is better: meeting or beating target earns the full 100 points.
+      return clamp((target / actual) * 100, 0, 100);
     }
+
     return 0;
+  }
+
+  function metricTargetMet(team, key){
+    const m = team.metrics || {};
+    const targets = config.targets || {csat:64, qa:90, ahtSeconds:735};
+    if(key === 'csat') return Number(m.csat) >= Number(targets.csat);
+    if(key === 'qa') return Number(m.qa) >= Number(targets.qa);
+    if(key === 'aht') return Number(m.ahtSeconds) <= Number(targets.ahtSeconds);
+    return false;
+  }
+
+  function targetCount(team){
+    return ['csat','qa','aht'].filter(key => metricTargetMet(team,key)).length;
+  }
+
+  function statusFor(team){
+    const count = targetCount(team);
+    if(count === 3) return 'Target Master';
+    if(count === 2) return '2 of 3 targets';
+    if(count === 1) return '1 of 3 targets';
+    return 'Building momentum';
+  }
+
+  function metricStatus(team, key){
+    return metricTargetMet(team,key) ? 'ON TARGET' : 'BELOW TARGET';
+  }
+
+  function metricTargetText(team, key){
+    const targets = config.targets || {csat:64, qa:90, ahtSeconds:735};
+    if(key === 'csat') return `Target ${Math.round(targets.csat)}%`;
+    if(key === 'qa') return `Target ${Math.round(targets.qa)}%`;
+    if(key === 'aht') return `Target ${formatAHT(targets.ahtSeconds)}`;
+    return '';
+  }
+
+  function metricGapText(team, key){
+    const m = team.metrics || {};
+    const targets = config.targets || {csat:64, qa:90, ahtSeconds:735};
+    if(key === 'csat'){
+      const gap = Number(m.csat) - Number(targets.csat);
+      return gap >= 0 ? `+${oneDecimal(gap)} pts vs target` : `${oneDecimal(Math.abs(gap))} pts below target`;
+    }
+    if(key === 'qa'){
+      const gap = Number(m.qa) - Number(targets.qa);
+      return gap >= 0 ? `+${oneDecimal(gap)} pts vs target` : `${oneDecimal(Math.abs(gap))} pts below target`;
+    }
+    if(key === 'aht'){
+      const gap = Number(m.ahtSeconds) - Number(targets.ahtSeconds);
+      return gap <= 0 ? `${formatAHT(Math.abs(gap))} faster than target` : `${formatAHT(gap)} above target`;
+    }
+    return '';
   }
 
   function calculateTeam(team){
@@ -274,24 +342,19 @@
     const qa = metricScore(team,'qa');
     const aht = metricScore(team,'aht');
     const score = csat*config.weights.csat + qa*config.weights.qa + aht*config.weights.aht;
+    const targetsHit = targetCount(team);
     return {
       ...team,
       score: clamp(score,0,100),
       metricScores: {csat,qa,aht},
+      targetsHit,
+      allTargetsMet: targetsHit === 3,
       contributions: {
         csat: csat*config.weights.csat,
         qa: qa*config.weights.qa,
         aht: aht*config.weights.aht
       }
     };
-  }
-
-  function statusFor(score){
-    if(score >= 90) return "Final stretch";
-    if(score >= 75) return "Podium push";
-    if(score >= 50) return "Midfield battle";
-    if(score >= 25) return "Building momentum";
-    return "Warm-up lap";
   }
 
   function rankSuffix(rank){
@@ -320,15 +383,9 @@
     const m = team.metrics;
     const w = config.weights;
     return [
-      {
-        key:'csat',label:'CSAT',value:`${Math.round(m.csat)}%`,score:team.metricScores.csat,weight:w.csat,contribution:team.contributions.csat
-      },
-      {
-        key:'qa',label:'QA',value:`${Math.round(m.qa)}%`,score:team.metricScores.qa,weight:w.qa,contribution:team.contributions.qa
-      },
-      {
-        key:'aht',label:'AHT',value:`${formatAHT(m.ahtSeconds)}`,score:team.metricScores.aht,weight:w.aht,contribution:team.contributions.aht
-      }
+      {key:'csat',label:'CSAT',value:`${Math.round(m.csat)}%`,score:team.metricScores.csat,weight:w.csat,contribution:team.contributions.csat,met:metricTargetMet(team,'csat')},
+      {key:'qa',label:'QA',value:`${Math.round(m.qa)}%`,score:team.metricScores.qa,weight:w.qa,contribution:team.contributions.qa,met:metricTargetMet(team,'qa')},
+      {key:'aht',label:'AHT',value:`${formatAHT(m.ahtSeconds)}`,score:team.metricScores.aht,weight:w.aht,contribution:team.contributions.aht,met:metricTargetMet(team,'aht')}
     ];
   }
 
@@ -346,7 +403,11 @@
   function render(data){
     config = {
       weights: normalizeWeights(data.settings?.weights),
-      aht: data.settings?.aht || {targetSeconds:600,scoringMethod:'target_ratio'}
+      targets: {
+        csat: Number(data.settings?.targets?.csat ?? 64),
+        qa: Number(data.settings?.targets?.qa ?? 90),
+        ahtSeconds: Number(data.settings?.targets?.ahtSeconds ?? 735)
+      }
     };
 
     teams = (data.teams || [])
@@ -377,7 +438,7 @@
         <div class="lane-meta">
           <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
           <span class="team-dot" style="background:${team.color}"></span>
-          <div><div class="team-name">${team.name}</div><div class="status">${statusFor(team.score)} · ${percentage(team.score)}</div></div>
+          <div><div class="team-name">${team.name}</div><div class="status">${statusFor(team)} · ${team.targetsHit}/3 targets</div></div>
         </div>
         <div class="track">
           <div class="checkpoint c25"><b>25</b></div><div class="checkpoint c50"><b>50</b></div><div class="checkpoint c75"><b>75</b></div><div class="checkpoint c100"><b>100</b></div>
@@ -395,7 +456,7 @@
         <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
         <div class="stand-team">
           <strong>${team.name}</strong>
-          <div class="stand-sub">${statusFor(team.score)}</div>
+          <div class="stand-sub">${statusFor(team)} · ${team.targetsHit}/3 targets</div>
           <div class="mini-progress"><i style="width:${team.score}%;background:${team.color}"></i></div>
         </div>
         <div class="stand-score">${oneDecimal(team.score)}%</div>
@@ -433,8 +494,8 @@
     const rankText=`${rank}${rankSuffix(rank)}`;
 
     document.getElementById('detailName').textContent=team.name;
-    document.getElementById('detailMeta').textContent=`${statusFor(team.score)} · ${rankText} in the league`;
-    document.getElementById('detailStatus').textContent=statusFor(team.score);
+    document.getElementById('detailMeta').textContent=`${statusFor(team)} · ${rankText} in the league · ${team.targetsHit}/3 targets`;
+    document.getElementById('detailStatus').textContent=`${team.targetsHit}/3 targets`;
     document.getElementById('selectedRank').textContent=`${rankText} place · weighted score`;
     document.getElementById('detailScore').textContent=oneDecimal(team.score);
     document.getElementById('detailDot').style.background=team.color;
@@ -446,17 +507,18 @@
 
     [25,50,75,100].forEach(m=>document.getElementById('m'+m).classList.toggle('done',team.score>=m));
 
-    document.getElementById('ahtNote').textContent=`AHT scoring: target ${formatAHT(config.aht.targetSeconds)} per contact = 100 AHT points. Higher AHT lowers the AHT score.`;
+    document.getElementById('targetNote').textContent=`Targets: CSAT ${Math.round(config.targets.csat)}% · QA ${Math.round(config.targets.qa)}% · AHT ${formatAHT(config.targets.ahtSeconds)}. Meeting the target earns 100 points for that metric.`;
 
     const metricList=document.getElementById('metricList');
     metricList.innerHTML = metricConfigRows(team).map(metric=>`
-      <div class="metric-row ${metric.key}">
+      <div class="metric-row ${metric.key}" style="border-color:${metric.met ? 'rgba(89,216,140,.20)' : 'rgba(255,113,131,.12)'}">
         <div class="metric-top">
           <div class="metric-name">${metric.label} · weight ${Math.round(metric.weight*100)}%</div>
           <div class="metric-values">${metric.value}</div>
         </div>
+        <div class="metric-contrib">${metricTargetText(team,metric.key)} · ${metricStatus(team,metric.key)} · ${metricGapText(team,metric.key)}</div>
         <div class="metric-contrib">Performance score: <strong>${oneDecimal(metric.score)}</strong> · contributes <strong>${oneDecimal(metric.contribution)} pts</strong></div>
-        <div class="metric-bar"><i style="width:${metric.score}%;background:${metric.key==='csat'?'#ff7183':metric.key==='qa'?'#59d88c':'#42e8ff'}"></i></div>
+        <div class="metric-bar"><i style="width:${metric.score}%;background:${metric.met?'#59d88c':metric.key==='csat'?'#ff7183':metric.key==='qa'?'#ffb454':'#42e8ff'}"></i></div>
       </div>
     `).join('');
   }
