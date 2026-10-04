@@ -3,13 +3,14 @@
   "lastUpdated": "2026-10-04",
   "settings": {
     "weights": {
-      "csat": 0.40,
-      "qa": 0.30,
-      "aht": 0.30
+      "csat": 0.4,
+      "qa": 0.3,
+      "aht": 0.3
     },
-    "aht": {
-      "targetSeconds": 600,
-      "scoringMethod": "target_ratio"
+    "targets": {
+      "csat": 64,
+      "qa": 90,
+      "ahtSeconds": 735
     }
   },
   "teams": [
