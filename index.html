@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>First American League</title>
+<meta name="theme-color" content="#08111f">
+<title>Call Center League</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
@@ -18,12 +19,14 @@
     --cyan:#42e8ff;
     --gold:#ffd45a;
     --green:#59d88c;
+    --red:#ff7183;
     --shadow:0 18px 50px rgba(0,0,0,.35);
   }
 
   *{box-sizing:border-box}
   html,body{margin:0;min-height:100%;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 20% 0%,rgba(42,115,170,.18),transparent 35%),radial-gradient(circle at 90% 15%,rgba(77,56,153,.16),transparent 32%),linear-gradient(160deg,var(--bg),#060d17);color:var(--text)}
   body{padding:24px;overflow-x:hidden}
+  button{font:inherit;color:inherit}
 
   .app{max-width:1500px;margin:0 auto}
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
@@ -42,9 +45,9 @@
   .race-card{padding:20px;position:relative;overflow:hidden}
   .race-card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(110,145,178,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(110,145,178,.05) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,#000,transparent 88%);pointer-events:none}
   .race-header{position:relative;display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:12px}
-  .race-header h2{font:700 18px "Space Grotesk";margin:0}
+  .race-header h2,.standings h2,.details h2{font:700 18px "Space Grotesk";margin:0}
   .race-header p{font-size:12px;color:var(--muted);margin:4px 0 0}
-  .leader-badge{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:12px;background:rgba(255,212,90,.08);border:1px solid rgba(255,212,90,.22);font-size:12px;color:#f6de8d}
+  .leader-badge{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:12px;background:rgba(255,212,90,.08);border:1px solid rgba(255,212,90,.22);font-size:12px;color:#f6de8d;white-space:nowrap}
   .leader-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
 
   .track-head{display:grid;grid-template-columns:170px 1fr 68px;gap:12px;align-items:end;color:#839ab4;font-size:10px;text-transform:uppercase;letter-spacing:.12em;padding:0 10px 6px}
@@ -52,7 +55,9 @@
   .scale span{position:absolute;transform:translateX(-50%)}
   .scale span:nth-child(1){left:0;transform:none}.scale span:nth-child(2){left:25%}.scale span:nth-child(3){left:50%}.scale span:nth-child(4){left:75%}.scale span:nth-child(5){left:100%}
   .lanes{display:flex;flex-direction:column;gap:9px;position:relative}
-  .lane{display:grid;grid-template-columns:170px 1fr 68px;gap:12px;align-items:center;min-height:70px;padding:8px 10px;border-radius:16px;background:linear-gradient(180deg,rgba(10,24,40,.86),rgba(8,19,32,.78));border:1px solid rgba(160,190,220,.08);position:relative}
+  .lane{display:grid;grid-template-columns:170px 1fr 68px;gap:12px;align-items:center;min-height:70px;padding:8px 10px;border-radius:16px;background:linear-gradient(180deg,rgba(10,24,40,.86),rgba(8,19,32,.78));border:1px solid rgba(160,190,220,.08);position:relative;cursor:pointer;transition:transform .2s ease,border-color .2s ease,background .2s ease}
+  .lane:hover{transform:translateY(-1px);border-color:rgba(167,192,221,.18)}
+  .lane.active{border-color:rgba(66,232,255,.24);background:linear-gradient(180deg,rgba(20,39,61,.92),rgba(8,19,32,.82));box-shadow:inset 0 0 0 1px rgba(66,232,255,.04)}
   .lane:first-child{border-color:rgba(255,212,90,.18);box-shadow:inset 0 0 0 1px rgba(255,212,90,.04)}
   .lane-meta{display:flex;align-items:center;gap:10px;min-width:0}
   .rank{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#152942;color:#d7e4f3;font-weight:800;font-size:12px;flex:0 0 auto}
@@ -63,60 +68,53 @@
   .track{height:48px;position:relative;border-radius:13px;background:#07131f;border:1px solid rgba(169,194,220,.09);overflow:hidden}
   .track:before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:repeating-linear-gradient(90deg,rgba(173,199,223,.10) 0 18px,transparent 18px 32px)}
   .track:after{content:"";position:absolute;inset:8px 0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.03) 50%,transparent 100%);pointer-events:none}
-  .checkpoint{position:absolute;top:0;bottom:0;width:1px;background:rgba(165,189,214,.13)}
+  .checkpoint{position:absolute;top:0;bottom:0;width:1px;background:rgba(165,189,214,.13);z-index:2}
   .checkpoint b{position:absolute;top:4px;left:5px;font-size:8px;color:#68809a;font-weight:500}
   .checkpoint.c25{left:25%}.checkpoint.c50{left:50%}.checkpoint.c75{left:75%}.checkpoint.c100{right:0;background:rgba(66,232,255,.26)}
   .progress{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,.02),var(--team) 85%);opacity:.34;transition:width 1.1s cubic-bezier(.2,.85,.18,1)}
   .trail{position:absolute;top:50%;height:6px;transform:translateY(-50%);border-radius:999px;background:linear-gradient(90deg,transparent,var(--team));filter:blur(3px);opacity:.55;width:0;transition:width 1.1s cubic-bezier(.2,.85,.18,1)}
-  .car{position:absolute;top:50%;left:0;transform:translate(-50%,-54%);width:56px;height:28px;transition:left 1.1s cubic-bezier(.2,.85,.18,1);filter:drop-shadow(0 7px 8px rgba(0,0,0,.5))}
+  .car{position:absolute;top:50%;left:0;transform:translate(-50%,-54%);width:56px;height:28px;transition:left 1.1s cubic-bezier(.2,.85,.18,1);filter:drop-shadow(0 7px 8px rgba(0,0,0,.5));z-index:3}
   .car svg{width:100%;height:100%}
-  .score{font:800 17px "Space Grotesk";text-align:right}
+  .score{font:800 17px "Space Grotesk";text-align:right}.score small{font-size:10px;color:var(--muted);font-weight:600}
   .finish-flag{font-size:15px;margin-left:4px;vertical-align:2px}
 
   .standings{padding:20px}
-  .standings h2,.details h2{font:700 18px "Space Grotesk";margin:0}
   .section-note{font-size:12px;color:var(--muted);margin:5px 0 15px}
-  .stand-row{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:11px 8px;border-radius:14px;margin-bottom:7px;border:1px solid transparent}
+  .stand-row{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:11px 8px;border-radius:14px;margin-bottom:7px;border:1px solid transparent;cursor:pointer;transition:background .2s ease,border-color .2s ease}
+  .stand-row:hover{background:rgba(255,255,255,.025)}
   .stand-row.active{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.07)}
-  .stand-team{min-width:0}
-  .stand-team strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mini-progress{height:5px;background:#172a40;border-radius:999px;overflow:hidden;margin-top:6px}
-  .mini-progress i{display:block;height:100%;border-radius:999px}
+  .stand-team{min-width:0}.stand-team strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini-progress{height:5px;background:#172a40;border-radius:999px;overflow:hidden;margin-top:6px}.mini-progress i{display:block;height:100%;border-radius:999px}
   .stand-score{font:700 15px "Space Grotesk"}
+  .stand-sub{font-size:9px;color:#71879d;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
 
-  .details{margin-top:18px;padding:20px;min-height:230px;position:relative;overflow:hidden}
+  .details{margin-top:18px;padding:20px;min-height:275px;position:relative;overflow:hidden}
   .detail-top{display:flex;justify-content:space-between;gap:14px;align-items:start}
   .detail-team{display:flex;align-items:center;gap:10px}
   .detail-team .big-dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,.03)}
-  .detail-title{font:700 16px "Space Grotesk";margin:0}
-  .detail-meta{font-size:11px;color:var(--muted);margin-top:3px}
-  .big-score{font:800 42px "Space Grotesk";line-height:1;text-align:right}
-  .big-score small{font-size:15px;color:var(--muted);font-weight:700}
-  .detail-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;margin-top:20px}
-  .score-meter{height:13px;background:#0a1828;border:1px solid rgba(167,191,218,.09);border-radius:99px;overflow:hidden}
-  .score-meter i{display:block;height:100%;border-radius:99px;width:0;transition:width 1.1s ease}
+  .detail-title{font:700 16px "Space Grotesk";margin:0}.detail-meta{font-size:11px;color:var(--muted);margin-top:3px}
+  .big-score{font:800 42px "Space Grotesk";line-height:1;text-align:right}.big-score small{font-size:15px;color:var(--muted);font-weight:700}
+
+  .detail-grid{display:grid;grid-template-columns:1.05fr 1.55fr;gap:18px;margin-top:20px}
+  .performance-block{padding:14px;border-radius:15px;background:rgba(4,14,25,.45);border:1px solid rgba(164,187,214,.08)}
+  .block-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.block-heading strong{font:700 13px "Space Grotesk"}.block-heading span{font-size:10px;color:var(--muted)}
+  .score-meter{height:13px;background:#0a1828;border:1px solid rgba(167,191,218,.09);border-radius:99px;overflow:hidden}.score-meter i{display:block;height:100%;border-radius:99px;width:0;transition:width 1.1s ease}
   .meter-labels{display:flex;justify-content:space-between;margin-top:7px;font-size:10px;color:#6f879f}
-  .milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-  .milestone{padding:9px 8px;border-radius:12px;background:rgba(5,16,28,.58);border:1px solid rgba(159,188,216,.08);text-align:center}
-  .milestone b{display:block;font-size:12px}.milestone span{font-size:9px;color:#748ca4}
-  .milestone.done{border-color:rgba(89,216,140,.25);background:rgba(89,216,140,.06)}
-  .milestone.done b{color:var(--green)}
+  .metric-list{display:grid;gap:9px}
+  .metric-row{padding:10px 11px;border-radius:12px;background:rgba(8,20,33,.56);border:1px solid rgba(159,188,216,.07)}
+  .metric-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.metric-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}.metric-values{font-size:12px;font-weight:800}.metric-score{font:800 13px "Space Grotesk"}.metric-contrib{font-size:10px;color:#738aa2;margin-top:3px}.metric-bar{height:5px;border-radius:99px;background:#16283c;overflow:hidden;margin-top:7px}.metric-bar i{display:block;height:100%;border-radius:99px}
+  .metric-row.aht .metric-values{font-size:11px}
 
-  .footer{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;color:#71879d;font-size:10px}
-  .legend{display:flex;gap:14px;flex-wrap:wrap}.legend span{display:flex;gap:5px;align-items:center}
-  .legend i{width:7px;height:7px;border-radius:50%;background:#51667e}.legend i.cyan{background:var(--cyan)}
+  .milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+  .milestone{padding:9px 8px;border-radius:12px;background:rgba(5,16,28,.58);border:1px solid rgba(159,188,216,.08);text-align:center}.milestone b{display:block;font-size:12px}.milestone span{font-size:9px;color:#748ca4}.milestone.done{border-color:rgba(89,216,140,.25);background:rgba(89,216,140,.06)}.milestone.done b{color:var(--green)}
 
-  @media (max-width: 1050px){
-    body{padding:14px}.layout{grid-template-columns:1fr}.standings{order:2}.details{order:3}
-  }
-  @media (max-width: 700px){
-    .topbar{align-items:flex-start}.top-stats{display:none}
-    .track-head,.lane{grid-template-columns:115px 1fr 50px;gap:7px}
-    .track-head{padding-left:5px}.lane{padding:7px 6px}.team-name{font-size:11px}.status{font-size:9px}
-    .rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}
-    .car{width:49px}.score{font-size:14px}
-    .detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}
-  }
+  .formula{margin-top:12px;font-size:10px;color:#7088a0}.formula strong{color:#b9cbe0}
+  .config-note{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(66,232,255,.04);border:1px solid rgba(66,232,255,.10);color:#7da5b6;font-size:10px}
+
+  .footer{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;color:#71879d;font-size:10px}.legend{display:flex;gap:14px;flex-wrap:wrap}.legend span{display:flex;gap:5px;align-items:center}.legend i{width:7px;height:7px;border-radius:50%;background:#51667e}.legend i.cyan{background:var(--cyan)}
+
+  @media (max-width: 1050px){body{padding:14px}.layout{grid-template-columns:1fr}.standings{order:2}.details{order:3}}
+  @media (max-width: 700px){.topbar{align-items:flex-start}.top-stats{display:none}.track-head,.lane{grid-template-columns:115px 1fr 50px;gap:7px}.track-head{padding-left:5px}.lane{padding:7px 6px}.team-name{font-size:11px}.status{font-size:9px}.rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}.car{width:49px}.score{font-size:14px}.detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -125,12 +123,13 @@
     <div class="brand">
       <div class="brand-mark"><span>🏁</span></div>
       <div>
-        <h1>First American League</h1>
-        <div class="subtitle">A performance race where improvement becomes visible progress.</div>
+        <h1>Call Center League</h1>
+        <div class="subtitle">CSAT leads the scoring. QA and AHT decide how far each team races.</div>
       </div>
     </div>
     <div class="top-stats">
       <div class="pill">Season <strong id="seasonLabel">01</strong></div>
+      <div class="pill">Weights <strong id="weightLabel">40 / 30 / 30</strong></div>
       <div class="pill">Updated <strong id="updatedLabel">—</strong></div>
       <div class="pill">Leader <strong id="leaderLabel">—</strong></div>
     </div>
@@ -141,16 +140,14 @@
       <div class="race-header">
         <div>
           <h2>Championship Circuit</h2>
-          <p>Every 25% is a checkpoint. 100% is the finish line.</p>
+          <p>The race position is calculated from the weighted performance score.</p>
         </div>
         <div class="leader-badge"><span class="leader-dot"></span><span id="leaderBadge">Loading standings…</span></div>
       </div>
 
       <div class="track-head">
         <div>Teams</div>
-        <div class="scale">
-          <span>Start</span><span>25%</span><span>50%</span><span>75%</span><span>Finish</span>
-        </div>
+        <div class="scale"><span>Start</span><span>25%</span><span>50%</span><span>75%</span><span>Finish</span></div>
         <div style="text-align:right">Score</div>
       </div>
       <div id="lanes" class="lanes"></div>
@@ -160,26 +157,24 @@
           <span><i class="cyan"></i> Live position</span>
           <span><i></i> Checkpoint</span>
         </div>
-        <div>Scores are loaded from <code>data.json</code></div>
+        <div>Scores are calculated from <code>data.json</code></div>
       </div>
     </section>
 
     <aside class="panel standings">
       <h2>Standings</h2>
-      <div class="section-note">Rank is determined by the overall performance score.</div>
+      <div class="section-note">Ranking is based on CSAT 40% + QA 30% + AHT 30%.</div>
       <div id="standingList"></div>
     </aside>
   </main>
 
   <section class="panel details" id="details">
     <div class="detail-top">
-      <div>
-        <div class="detail-team">
-          <span class="big-dot" id="detailDot"></span>
-          <div>
-            <h2 class="detail-title" id="detailName">Select a team</h2>
-            <div class="detail-meta" id="detailMeta">Click any lane or standing row to inspect the race status.</div>
-          </div>
+      <div class="detail-team">
+        <span class="big-dot" id="detailDot"></span>
+        <div>
+          <h2 class="detail-title" id="detailName">Select a team</h2>
+          <div class="detail-meta" id="detailMeta">Click any team to inspect its metric breakdown.</div>
         </div>
       </div>
       <div class="big-score"><span id="detailScore">—</span><small>%</small></div>
@@ -187,14 +182,27 @@
 
     <div class="detail-grid">
       <div>
-        <div class="score-meter"><i id="detailMeter"></i></div>
-        <div class="meter-labels"><span>0% Start</span><span>100% Finish</span></div>
+        <div class="performance-block">
+          <div class="block-heading">
+            <strong>Overall performance</strong>
+            <span id="detailStatus">—</span>
+          </div>
+          <div class="score-meter"><i id="detailMeter"></i></div>
+          <div class="meter-labels"><span>0% Start</span><span>100% Finish</span></div>
+          <div class="milestones">
+            <div class="milestone" id="m25"><b>25%</b><span>Checkpoint 1</span></div>
+            <div class="milestone" id="m50"><b>50%</b><span>Midway</span></div>
+            <div class="milestone" id="m75"><b>75%</b><span>Sprint</span></div>
+            <div class="milestone" id="m100"><b>100%</b><span>Finish</span></div>
+          </div>
+          <div class="formula">Performance = <strong>CSAT × 40%</strong> + <strong>QA × 30%</strong> + <strong>AHT Score × 30%</strong></div>
+          <div class="config-note" id="ahtNote">AHT is reverse-scored: meeting the target earns 100 AHT points.</div>
+        </div>
       </div>
-      <div class="milestones">
-        <div class="milestone" id="m25"><b>25%</b><span>Checkpoint 1</span></div>
-        <div class="milestone" id="m50"><b>50%</b><span>Midway</span></div>
-        <div class="milestone" id="m75"><b>75%</b><span>Sprint</span></div>
-        <div class="milestone" id="m100"><b>100%</b><span>Finish</span></div>
+
+      <div>
+        <div class="block-heading"><strong>Metric breakdown</strong><span id="selectedRank">—</span></div>
+        <div id="metricList" class="metric-list"></div>
       </div>
     </div>
   </section>
@@ -202,23 +210,83 @@
 
 <script>
   const fallbackData = {
+    season: "01",
     lastUpdated: new Date().toISOString().slice(0,10),
+    settings: {
+      weights: { csat: 0.40, qa: 0.30, aht: 0.30 },
+      aht: { targetSeconds: 600, scoringMethod: "target_ratio" }
+    },
     teams: [
-      {id:1,name:"Team Alpha",color:"#E63946",score:82},
-      {id:2,name:"Team Bravo",color:"#1D3557",score:65},
-      {id:3,name:"Team Charlie",color:"#2A9D8F",score:45},
-      {id:4,name:"Team Delta",color:"#F4A261",score:91},
-      {id:5,name:"Team Echo",color:"#9C27B0",score:30},
-      {id:6,name:"Team Foxtrot",color:"#4CAF50",score:58}
+      {id:1,name:"Team Alpha",color:"#E63946",metrics:{csat:87,qa:82,ahtSeconds:780}},
+      {id:2,name:"Team Bravo",color:"#1D3557",metrics:{csat:68,qa:60,ahtSeconds:900}},
+      {id:3,name:"Team Charlie",color:"#2A9D8F",metrics:{csat:47,qa:43,ahtSeconds:1200}},
+      {id:4,name:"Team Delta",color:"#F4A261",metrics:{csat:96,qa:94,ahtSeconds:660}},
+      {id:5,name:"Team Echo",color:"#9C27B0",metrics:{csat:35,qa:25,ahtSeconds:1800}},
+      {id:6,name:"Team Foxtrot",color:"#4CAF50",metrics:{csat:60,qa:52,ahtSeconds:1000}}
     ]
   };
 
   let teams = [];
+  let config = fallbackData.settings;
   let selectedId = null;
 
-  function clamp(n,min,max){ return Math.min(Math.max(Number(n)||0,min),max); }
+  function clamp(n,min,max){
+    const value = Number(n);
+    if(!Number.isFinite(value)) return min;
+    return Math.min(Math.max(value,min),max);
+  }
 
-  function statusFor(score, rank){
+  function normalizeWeights(weights={}){
+    const raw = {
+      csat: Math.max(0, Number(weights.csat) || 0),
+      qa: Math.max(0, Number(weights.qa) || 0),
+      aht: Math.max(0, Number(weights.aht) || 0)
+    };
+    const total = raw.csat + raw.qa + raw.aht;
+    return total > 0 ? {csat:raw.csat/total, qa:raw.qa/total, aht:raw.aht/total} : {csat:.4,qa:.3,aht:.3};
+  }
+
+  function percentage(value){ return `${Math.round(value)}%`; }
+  function oneDecimal(value){ return Number(value).toFixed(1); }
+
+  function formatAHT(seconds){
+    const total = Math.max(0, Math.round(Number(seconds) || 0));
+    const mins = Math.floor(total / 60);
+    const secs = total % 60;
+    return `${mins}:${String(secs).padStart(2,'0')}`;
+  }
+
+  function metricScore(team, key){
+    const m = team.metrics || {};
+    if(key === 'csat') return clamp(m.csat,0,100);
+    if(key === 'qa') return clamp(m.qa,0,100);
+    if(key === 'aht'){
+      const actual = Number(m.ahtSeconds);
+      const target = Math.max(1, Number(config.aht?.targetSeconds) || 1);
+      if(!Number.isFinite(actual) || actual <= 0) return 0;
+      return clamp((target / actual) * 100,0,100);
+    }
+    return 0;
+  }
+
+  function calculateTeam(team){
+    const csat = metricScore(team,'csat');
+    const qa = metricScore(team,'qa');
+    const aht = metricScore(team,'aht');
+    const score = csat*config.weights.csat + qa*config.weights.qa + aht*config.weights.aht;
+    return {
+      ...team,
+      score: clamp(score,0,100),
+      metricScores: {csat,qa,aht},
+      contributions: {
+        csat: csat*config.weights.csat,
+        qa: qa*config.weights.qa,
+        aht: aht*config.weights.aht
+      }
+    };
+  }
+
+  function statusFor(score){
     if(score >= 90) return "Final stretch";
     if(score >= 75) return "Podium push";
     if(score >= 50) return "Midfield battle";
@@ -226,24 +294,42 @@
     return "Warm-up lap";
   }
 
+  function rankSuffix(rank){
+    if(rank===1) return 'st';
+    if(rank===2) return 'nd';
+    if(rank===3) return 'rd';
+    return 'th';
+  }
+
   function carSVG(color){
+    const safe = color.replace('#','');
     return `
       <svg viewBox="0 0 120 56" aria-hidden="true">
-        <defs>
-          <linearGradient id="g-${color.replace('#','')}" x1="0" x2="1">
-            <stop offset="0" stop-color="${color}" stop-opacity=".72"/>
-            <stop offset="1" stop-color="${color}"/>
-          </linearGradient>
-        </defs>
-        <path d="M18 35 L27 25 Q34 18 48 17 L78 17 Q87 18 94 25 L104 29 L108 36 L100 38 L20 38 Z" fill="url(#g-${color.replace('#','')})"/>
+        <defs><linearGradient id="g-${safe}" x1="0" x2="1"><stop offset="0" stop-color="${color}" stop-opacity=".72"/><stop offset="1" stop-color="${color}"/></linearGradient></defs>
+        <path d="M18 35 L27 25 Q34 18 48 17 L78 17 Q87 18 94 25 L104 29 L108 36 L100 38 L20 38 Z" fill="url(#g-${safe})"/>
         <path d="M45 18 L55 10 L79 10 L88 19 Z" fill="${color}" opacity=".92"/>
         <path d="M56 12 L76 12 L81 18 L50 18 Z" fill="#0d1b29" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
-        <circle cx="33" cy="39" r="8" fill="#07101a" stroke="#a9bfd5" stroke-width="2"/>
-        <circle cx="91" cy="39" r="8" fill="#07101a" stroke="#a9bfd5" stroke-width="2"/>
+        <circle cx="33" cy="39" r="8" fill="#07101a" stroke="#a9bfd5" stroke-width="2"/><circle cx="91" cy="39" r="8" fill="#07101a" stroke="#a9bfd5" stroke-width="2"/>
         <circle cx="33" cy="39" r="3" fill="#6d8195"/><circle cx="91" cy="39" r="3" fill="#6d8195"/>
         <rect x="13" y="31" width="12" height="3" rx="1.5" fill="#e9f5ff" opacity=".55"/>
         <path d="M103 28 L116 32 L116 34 L106 34 Z" fill="${color}"/>
       </svg>`;
+  }
+
+  function metricConfigRows(team){
+    const m = team.metrics;
+    const w = config.weights;
+    return [
+      {
+        key:'csat',label:'CSAT',value:`${Math.round(m.csat)}%`,score:team.metricScores.csat,weight:w.csat,contribution:team.contributions.csat
+      },
+      {
+        key:'qa',label:'QA',value:`${Math.round(m.qa)}%`,score:team.metricScores.qa,weight:w.qa,contribution:team.contributions.qa
+      },
+      {
+        key:'aht',label:'AHT',value:`${formatAHT(m.ahtSeconds)}`,score:team.metricScores.aht,weight:w.aht,contribution:team.contributions.aht
+      }
+    ];
   }
 
   async function loadData(){
@@ -258,8 +344,13 @@
   }
 
   function render(data){
+    config = {
+      weights: normalizeWeights(data.settings?.weights),
+      aht: data.settings?.aht || {targetSeconds:600,scoringMethod:'target_ratio'}
+    };
+
     teams = (data.teams || [])
-      .map(t => ({...t, score: clamp(t.score,0,100)}))
+      .map(calculateTeam)
       .sort((a,b) => b.score - a.score);
 
     const lanes = document.getElementById('lanes');
@@ -267,39 +358,32 @@
     lanes.innerHTML = '';
     standings.innerHTML = '';
 
-    if(selectedId === null || !teams.some(t => t.id === selectedId)){
-      selectedId = teams[0]?.id ?? null;
-    }
+    if(selectedId === null || !teams.some(t => t.id === selectedId)) selectedId = teams[0]?.id ?? null;
 
+    const leader = teams[0];
+    document.getElementById('seasonLabel').textContent = data.season || '01';
     document.getElementById('updatedLabel').textContent = data.lastUpdated || '—';
-    document.getElementById('leaderLabel').textContent = teams[0]?.name?.replace('Team ','') || '—';
-    document.getElementById('leaderBadge').textContent = teams[0] ? `${teams[0].name} leads at ${teams[0].score}%` : 'No teams';
+    document.getElementById('weightLabel').textContent = `${Math.round(config.weights.csat*100)} / ${Math.round(config.weights.qa*100)} / ${Math.round(config.weights.aht*100)}`;
+    document.getElementById('leaderLabel').textContent = leader?.name?.replace('Team ','') || '—';
+    document.getElementById('leaderBadge').textContent = leader ? `${leader.name} leads at ${oneDecimal(leader.score)}%` : 'No teams';
 
     teams.forEach((team,index)=>{
       const rank=index+1;
       const row=document.createElement('div');
-      row.className='lane';
+      row.className='lane' + (selectedId===team.id?' active':'');
       row.dataset.id=team.id;
-      row.style.setProperty('--team', team.color);
+      row.style.setProperty('--team',team.color);
       row.innerHTML=`
         <div class="lane-meta">
           <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
           <span class="team-dot" style="background:${team.color}"></span>
-          <div>
-            <div class="team-name">${team.name}</div>
-            <div class="status">${statusFor(team.score,rank)}</div>
-          </div>
+          <div><div class="team-name">${team.name}</div><div class="status">${statusFor(team.score)} · ${percentage(team.score)}</div></div>
         </div>
         <div class="track">
-          <div class="checkpoint c25"><b>25</b></div>
-          <div class="checkpoint c50"><b>50</b></div>
-          <div class="checkpoint c75"><b>75</b></div>
-          <div class="checkpoint c100"><b>100</b></div>
-          <div class="progress" id="p-${team.id}"></div>
-          <div class="trail" id="t-${team.id}"></div>
-          <div class="car" id="c-${team.id}">${carSVG(team.color)}</div>
+          <div class="checkpoint c25"><b>25</b></div><div class="checkpoint c50"><b>50</b></div><div class="checkpoint c75"><b>75</b></div><div class="checkpoint c100"><b>100</b></div>
+          <div class="progress" id="p-${team.id}"></div><div class="trail" id="t-${team.id}"></div><div class="car" id="c-${team.id}">${carSVG(team.color)}</div>
         </div>
-        <div class="score">${team.score}%${team.score>=100?'<span class="finish-flag">🏁</span>':''}</div>
+        <div class="score">${oneDecimal(team.score)}<small>%</small>${team.score>=100?'<span class="finish-flag">🏁</span>':''}</div>
       `;
       row.addEventListener('click',()=>selectTeam(team.id));
       lanes.appendChild(row);
@@ -311,20 +395,19 @@
         <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
         <div class="stand-team">
           <strong>${team.name}</strong>
+          <div class="stand-sub">${statusFor(team.score)}</div>
           <div class="mini-progress"><i style="width:${team.score}%;background:${team.color}"></i></div>
         </div>
-        <div class="stand-score">${team.score}%</div>
+        <div class="stand-score">${oneDecimal(team.score)}%</div>
       `;
       srow.addEventListener('click',()=>selectTeam(team.id));
       standings.appendChild(srow);
 
       requestAnimationFrame(()=>{
-        const p=document.getElementById(`p-${team.id}`);
-        const t=document.getElementById(`t-${team.id}`);
-        const c=document.getElementById(`c-${team.id}`);
+        const p=document.getElementById(`p-${team.id}`), t=document.getElementById(`t-${team.id}`), c=document.getElementById(`c-${team.id}`);
         if(p) p.style.width=team.score+'%';
         if(t) t.style.width=Math.max(team.score-3,0)+'%';
-        if(c) c.style.left=`calc(${team.score}% + ${team.score === 0 ? 0 : 0}px)`;
+        if(c) c.style.left=`${team.score}%`;
       });
     });
 
@@ -338,9 +421,8 @@
   }
 
   function renderSelectionOnly(){
-    document.querySelectorAll('.stand-row').forEach(row=>{
-      row.classList.toggle('active', Number(row.dataset.id)===selectedId);
-    });
+    document.querySelectorAll('.stand-row').forEach(row=>row.classList.toggle('active',Number(row.dataset.id)===selectedId));
+    document.querySelectorAll('.lane').forEach(row=>row.classList.toggle('active',Number(row.dataset.id)===selectedId));
     updateSelectedDetails();
   }
 
@@ -348,17 +430,35 @@
     const team=teams.find(t=>t.id===selectedId);
     if(!team) return;
     const rank=teams.findIndex(t=>t.id===selectedId)+1;
+    const rankText=`${rank}${rankSuffix(rank)}`;
+
     document.getElementById('detailName').textContent=team.name;
-    document.getElementById('detailMeta').textContent=`${statusFor(team.score,rank)} · currently ${rank}${rank===1?'st':rank===2?'nd':rank===3?'rd':'th'} in the league`;
-    document.getElementById('detailScore').textContent=team.score;
+    document.getElementById('detailMeta').textContent=`${statusFor(team.score)} · ${rankText} in the league`;
+    document.getElementById('detailStatus').textContent=statusFor(team.score);
+    document.getElementById('selectedRank').textContent=`${rankText} place · weighted score`;
+    document.getElementById('detailScore').textContent=oneDecimal(team.score);
     document.getElementById('detailDot').style.background=team.color;
     document.getElementById('detailDot').style.boxShadow=`0 0 0 6px ${team.color}18`;
+
     const meter=document.getElementById('detailMeter');
     meter.style.background=`linear-gradient(90deg,${team.color},${team.color}99)`;
     requestAnimationFrame(()=>meter.style.width=team.score+'%');
-    [25,50,75,100].forEach(m=>{
-      document.getElementById('m'+m).classList.toggle('done',team.score>=m);
-    });
+
+    [25,50,75,100].forEach(m=>document.getElementById('m'+m).classList.toggle('done',team.score>=m));
+
+    document.getElementById('ahtNote').textContent=`AHT scoring: target ${formatAHT(config.aht.targetSeconds)} per contact = 100 AHT points. Higher AHT lowers the AHT score.`;
+
+    const metricList=document.getElementById('metricList');
+    metricList.innerHTML = metricConfigRows(team).map(metric=>`
+      <div class="metric-row ${metric.key}">
+        <div class="metric-top">
+          <div class="metric-name">${metric.label} · weight ${Math.round(metric.weight*100)}%</div>
+          <div class="metric-values">${metric.value}</div>
+        </div>
+        <div class="metric-contrib">Performance score: <strong>${oneDecimal(metric.score)}</strong> · contributes <strong>${oneDecimal(metric.contribution)} pts</strong></div>
+        <div class="metric-bar"><i style="width:${metric.score}%;background:${metric.key==='csat'?'#ff7183':metric.key==='qa'?'#59d88c':'#42e8ff'}"></i></div>
+      </div>
+    `).join('');
   }
 
   async function init(){
@@ -367,10 +467,7 @@
   }
 
   init();
-  setInterval(async()=>{
-    const data=await loadData();
-    render(data);
-  }, 30000);
+  setInterval(async()=>render(await loadData()),30000);
 </script>
 </body>
 </html>
