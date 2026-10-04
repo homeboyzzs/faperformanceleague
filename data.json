@@ -1,11 +1,77 @@
 {
+  "season": "01",
   "lastUpdated": "2026-10-04",
+  "settings": {
+    "weights": {
+      "csat": 0.40,
+      "qa": 0.30,
+      "aht": 0.30
+    },
+    "aht": {
+      "targetSeconds": 600,
+      "scoringMethod": "target_ratio"
+    }
+  },
   "teams": [
-    { "id": 1, "name": "Team Alpha", "color": "#E63946", "score": 82 },
-    { "id": 2, "name": "Team Bravo", "color": "#1D3557", "score": 65 },
-    { "id": 3, "name": "Team Charlie", "color": "#2A9D8F", "score": 45 },
-    { "id": 4, "name": "Team Delta", "color": "#F4A261", "score": 91 },
-    { "id": 5, "name": "Team Echo", "color": "#9C27B0", "score": 30 },
-    { "id": 6, "name": "Team Foxtrot", "color": "#4CAF50", "score": 58 }
+    {
+      "id": 1,
+      "name": "Team Alpha",
+      "color": "#E63946",
+      "metrics": {
+        "csat": 87,
+        "qa": 82,
+        "ahtSeconds": 780
+      }
+    },
+    {
+      "id": 2,
+      "name": "Team Bravo",
+      "color": "#1D3557",
+      "metrics": {
+        "csat": 68,
+        "qa": 60,
+        "ahtSeconds": 900
+      }
+    },
+    {
+      "id": 3,
+      "name": "Team Charlie",
+      "color": "#2A9D8F",
+      "metrics": {
+        "csat": 47,
+        "qa": 43,
+        "ahtSeconds": 1200
+      }
+    },
+    {
+      "id": 4,
+      "name": "Team Delta",
+      "color": "#F4A261",
+      "metrics": {
+        "csat": 96,
+        "qa": 94,
+        "ahtSeconds": 660
+      }
+    },
+    {
+      "id": 5,
+      "name": "Team Echo",
+      "color": "#9C27B0",
+      "metrics": {
+        "csat": 35,
+        "qa": 25,
+        "ahtSeconds": 1800
+      }
+    },
+    {
+      "id": 6,
+      "name": "Team Foxtrot",
+      "color": "#4CAF50",
+      "metrics": {
+        "csat": 60,
+        "qa": 52,
+        "ahtSeconds": 1000
+      }
+    }
   ]
 }
