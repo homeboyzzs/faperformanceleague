@@ -3,380 +3,433 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Sonic Racing - Call Center Championship</title>
+  <title>Split-Screen Call Center Racing</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&display=swap');
+
+    :root {
+      --bg-color: #05010a;
+      --panel-bg: rgba(10, 5, 20, 0.9);
+      --ui-border: rgba(0, 240, 255, 0.4);
+    }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: 'Rajdhani', sans-serif;
+      user-select: none;
     }
 
     body {
-      background: #05010a radial-gradient(circle at 50% 10%, #1e0938 0%, #05010a 90%);
+      background-color: var(--bg-color);
       color: #fff;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden; /* Prevent scrolling, act like a game screen */
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 20px 15px;
-      min-height: 100vh;
-      overflow-x: hidden;
+      padding: 10px 20px;
+      height: 80px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+      z-index: 100;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 0px; /* Reduced to bring board up */
-      z-index: 10;
-    }
-
-    h1 {
+    .title-area h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 2.8rem;
+      font-size: 1.8rem;
       font-weight: 900;
       font-style: italic;
       text-transform: uppercase;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       background: linear-gradient(180deg, #fff 20%, #00f0ff 60%, #ff0077 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.6));
+      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.4));
     }
 
-    p.subtitle {
+    .title-area p {
       color: #e2b6ff;
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: 4px;
+      font-size: 0.9rem;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      margin-top: 2px;
-      text-shadow: 0 0 8px rgba(226, 182, 255, 0.5);
     }
 
-    /* 3D Scene Setup */
-    .scene {
+    .minimap-container {
+      width: 250px;
+      height: 70px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--ui-border);
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+      padding: 5px;
+    }
+
+    .minimap-svg {
       width: 100%;
-      max-width: 1150px;
-      perspective: 1000px; /* This creates the 3D depth */
-      margin-top: 20px;
-      margin-bottom: 40px;
+      height: 100%;
     }
 
-    /* Track Container tilted backwards */
-    .track-container {
-      background: rgba(18, 10, 36, 0.95);
-      border: 3px solid #ff0077;
-      border-radius: 16px;
-      padding: 30px 20px 40px 20px;
-      box-shadow: 0 30px 60px rgba(255, 0, 119, 0.4), inset 0 0 40px rgba(0, 240, 255, 0.2);
-      transform: rotateX(45deg); /* Tilts the board */
-      transform-style: preserve-3d; /* Allows children to be 3D */
+    .map-dot {
+      transition: all 1s ease-out;
+      filter: drop-shadow(0 0 4px currentColor);
     }
 
-    /* Grid pattern on the floor to enhance 3D effect */
-    .track-container::before {
+    .split-screen-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 4px;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      padding-top: 80px; /* Offset for header */
+    }
+
+    .player-screen {
+      position: relative;
+      background: #080214;
+      overflow: hidden;
+      border: 2px solid #222;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    /* Team-specific glow borders */
+    .player-screen::after {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-image: 
-        linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
-      background-size: 40px 40px;
-      border-radius: 12px;
+      box-shadow: inset 0 0 40px var(--team-color);
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .scene-3d {
+      position: absolute;
+      bottom: -10%;
+      width: 100%;
+      height: 70%;
+      perspective: 400px;
+      display: flex;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .road {
+      width: 300%;
+      height: 200%;
+      position: absolute;
+      bottom: 0;
+      transform: rotateX(75deg);
+      transform-origin: bottom center;
+      /* Road texture with grid lines */
+      background: 
+        linear-gradient(90deg, rgba(255,255,255,0) 48%, rgba(255,255,255,0.8) 49%, rgba(255,255,255,0.8) 51%, rgba(255,255,255,0) 52%), /* Center Line */
+        linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(30,10,50,1) 100%);
+      background-size: 100px 100px, 100% 100%;
+      border-left: 15px solid var(--team-color);
+      border-right: 15px solid var(--team-color);
+      box-shadow: 0 0 50px var(--team-color);
+    }
+
+    /* Horizontal moving lines to create forward speed */
+    .road::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(to top, transparent, transparent 40px, rgba(0, 240, 255, 0.2) 42px, rgba(0, 240, 255, 0.2) 44px);
+      animation: drive 0.5s linear infinite;
+    }
+
+    @keyframes drive {
+      from { background-position: 0 0; }
+      to { background-position: 0 44px; }
+    }
+
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      padding: 15px;
       pointer-events: none;
     }
 
-    /* Distance Markers */
-    .distance-markers {
+    .hud-top {
       display: flex;
       justify-content: space-between;
-      margin-left: 155px;
-      margin-right: 40px;
-      padding-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .rank-indicator {
       font-family: 'Orbitron', sans-serif;
-      font-size: 14px;
-      color: #00f0ff;
-      letter-spacing: 1px;
-      text-shadow: 0 0 5px rgba(0,240,255,0.8);
-      transform: translateZ(1px); /* Keep slightly above board */
-    }
-
-    /* Individual Lane */
-    .lane {
-      display: flex;
-      align-items: center;
-      height: 85px;
-      margin-top: 5px;
-      position: relative;
-      transform-style: preserve-3d;
-    }
-
-    /* Glowing divider lines on the floor */
-    .lane::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 160px; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(255,0,119,0.5), transparent);
-      box-shadow: 0 0 10px rgba(255,0,119,0.8);
-    }
-
-    .team-label {
-      width: 150px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
-      transform: translateZ(10px) rotateX(-45deg); /* Counter-rotate to stand upright */
-      transform-origin: bottom center;
-      text-shadow: 0 5px 10px rgba(0,0,0,0.8);
-    }
-
-    .ring-badge {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff7a0 20%, #ffd700 60%, #b8860b 100%);
-      border: 2px solid #fff;
-      box-shadow: 0 0 15px #ffd700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 14px;
+      font-size: 2.5rem;
       font-weight: 900;
-      color: #3d2400;
+      color: #ffd700;
+      text-shadow: 2px 2px 0 #000, 0 0 10px #ffd700;
+      -webkit-text-stroke: 1px #b8860b;
     }
 
-    /* Track Asphalt */
-    .track {
-      flex: 1;
-      height: 55px;
-      position: relative;
-      background: rgba(0, 0, 0, 0.6);
-      margin: 0 10px;
-      border-radius: 8px;
-      border-top: 1px solid rgba(0, 240, 255, 0.3);
-      border-bottom: 1px solid rgba(0, 240, 255, 0.3);
-      box-shadow: inset 0 0 15px rgba(0,0,0,1);
-      transform-style: preserve-3d;
+    .rank-indicator span {
+      font-size: 1rem;
+      vertical-align: super;
     }
 
-    /* 3D Finish Line Gate */
-    .finish-gate {
-      position: absolute;
-      right: 0;
-      top: -20px;
-      bottom: -20px;
-      width: 10px;
-      background: linear-gradient(180deg, #00f0ff, #ffd700);
-      box-shadow: 0 0 20px #00f0ff, 0 0 40px #ff0077;
-      transform: rotateY(-90deg) translateZ(5px);
-      transform-origin: right center;
-    }
-
-    /* Car Positioning Wrapper (Slides left to right) */
-    .car-positioner {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      transition: left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      transform-style: preserve-3d;
-      z-index: 5;
-    }
-
-    /* Car Sprite (Counter-rotates to stand up in 3D) */
-    .car-sprite {
-      transform: rotateX(-45deg) translateZ(15px); /* Stands up and hovers slightly */
-      transform-origin: bottom center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-
-    /* Fake shadow on the 3D floor directly under the car */
-    .car-shadow {
-      position: absolute;
-      width: 70px;
-      height: 20px;
-      background: rgba(0,0,0,0.8);
-      border-radius: 50%;
-      top: 15px;
-      left: -5px;
-      filter: blur(5px);
-      transform: translateZ(1px); /* Flat on the floor */
-    }
-
-    .car-svg {
-      width: 70px;
-      height: 35px;
-      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.5)); /* Adds depth to the standing sprite */
-    }
-
-    .car-score-tooltip {
-      position: absolute;
-      top: -30px;
-      background: #ffd700;
-      color: #000;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 13px;
-      padding: 3px 8px;
+    .stats-panel {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--team-color);
+      padding: 5px 12px;
       border-radius: 4px;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-      white-space: nowrap;
+      text-align: right;
+      backdrop-filter: blur(4px);
     }
 
-    /* Leader Cards Bottom (Kept flat for UI readability) */
-    .podium-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      width: 100%;
-      max-width: 1150px;
-      z-index: 10;
-    }
-
-    .card {
-      background: rgba(20, 10, 40, 0.9);
-      border: 1px solid rgba(0, 240, 255, 0.3);
-      padding: 15px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: var(--team-color);
-      box-shadow: 0 0 15px var(--team-color);
-    }
-
-    .card .team-name {
+    .team-name {
       font-family: 'Orbitron', sans-serif;
-      font-size: 14px;
+      font-size: 1rem;
       font-weight: 700;
-      color: #a0aec0;
-      margin-bottom: 6px;
+      color: var(--team-color);
+      text-shadow: 0 0 5px var(--team-color);
+      text-transform: uppercase;
     }
 
-    .card .team-score {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 28px;
+    .score-text {
+      font-size: 1.4rem;
       font-weight: 900;
-      color: #00f0ff;
-      text-shadow: 0 0 15px rgba(0,240,255,0.6);
+      color: #fff;
+    }
+
+    .kart-wrapper {
+      position: absolute;
+      bottom: 15px;
+      z-index: 5;
+      animation: hover 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes hover {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(1deg); }
+      100% { transform: translateY(0px) rotate(-1deg); }
+    }
+
+    .kart-svg {
+      width: 140px;
+      height: 90px;
+      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.8));
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>⚡ Sonic Team Racing ⚡</h1>
-    <p class="subtitle">3D Performance Arena</p>
+  <header class="dashboard-header">
+    <div class="title-area">
+      <h1>⚡ Grand Prix Dashboard ⚡</h1>
+      <p>Live CSAT / Performance Circuit</p>
+    </div>
+    
+    <div class="minimap-container">
+      <svg class="minimap-svg" viewBox="0 0 250 70">
+        <!-- Circuit Path -->
+        <path id="circuit-track" 
+              d="M 35 35 L 215 35" 
+              fill="none" 
+              stroke="rgba(255,255,255,0.2)" 
+              stroke-width="15" 
+              stroke-linecap="round" />
+        <path id="circuit-highlight" 
+              d="M 35 35 L 215 35" 
+              fill="none" 
+              stroke="rgba(0, 240, 255, 0.5)" 
+              stroke-width="2" 
+              stroke-dasharray="5,5" 
+              stroke-linecap="round" />
+        
+        <!-- Minimap Dots will be injected here via JS -->
+        <g id="minimap-dots"></g>
+        
+        <!-- Start/Finish flags -->
+        <text x="15" y="40" fill="#fff" font-size="14">🏁</text>
+      </svg>
+    </div>
   </header>
 
-  <div class="scene">
-    <div class="track-container">
-      <div class="distance-markers">
-        <span>START (0%)</span>
-        <span>25%</span>
-        <span>50%</span>
-        <span>75%</span>
-        <span>🏁 100%</span>
-      </div>
-      <div id="lanes-list">Loading race tracks...</div>
-    </div>
+  <div class="split-screen-grid" id="split-screen-grid">
+    <!-- Player screens will be generated here -->
   </div>
 
-  <div class="podium-cards" id="podium-cards"></div>
-
   <script>
-    const lanesList = document.getElementById('lanes-list');
-    const podiumCards = document.getElementById('podium-cards');
+    // Fallback data in case data.json doesn't exist yet or fails to load
+    const dummyData = {
+      "teams": [
+        { "name": "Team Delta", "color": "#ffb800", "score": 91 },
+        { "name": "Team Alpha", "color": "#ff0055", "score": 82 },
+        { "name": "Team Bravo", "color": "#0066ff", "score": 65 },
+        { "name": "Team Foxtrot", "color": "#00ff66", "score": 58 },
+        { "name": "Team Charlie", "color": "#00f0ff", "score": 45 },
+        { "name": "Team Echo", "color": "#b800ff", "score": 30 }
+      ]
+    };
 
-    // High-tech Sonic style car SVG
-    function getSonicCarSVG(color) {
+    const gridContainer = document.getElementById('split-screen-grid');
+    const minimapDotsContainer = document.getElementById('minimap-dots');
+    
+    // Get path details for minimap calculations
+    const circuitPath = document.getElementById('circuit-track');
+    const pathLength = circuitPath.getTotalLength();
+
+    function getKartSVG(color) {
       return `
-        <svg class="car-svg" viewBox="0 0 120 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 32 L20 18 L55 12 L90 20 L115 30 L118 36 L5 38 Z" fill="${color}" />
-          <path d="M40 18 L70 18 L85 24 L35 24 Z" fill="#00f0ff" opacity="0.9" />
-          <path d="M15 32 L110 32" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
-          <path d="M2 22 L18 22 L15 28 L0 28 Z" fill="${color}" />
-          <rect x="5" y="28" width="4" height="6" fill="#111" />
-          <circle cx="30" cy="38" r="10" fill="#111" stroke="#00f0ff" stroke-width="2"/>
-          <circle cx="30" cy="38" r="4" fill="#fff" />
-          <circle cx="92" cy="38" r="10" fill="#111" stroke="#00f0ff" stroke-width="2"/>
-          <circle cx="92" cy="38" r="4" fill="#fff" />
+        <svg class="kart-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Exhaust Pipes -->
+          <rect x="60" y="80" width="15" height="15" fill="#333" rx="3"/>
+          <rect x="125" y="80" width="15" height="15" fill="#333" rx="3"/>
+          <!-- Exhaust Flames -->
+          <path d="M67 95 Q 67 110 60 115 Q 75 110 75 95 Z" fill="#00f0ff" opacity="0.8">
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="0.2s" repeatCount="indefinite"/>
+          </path>
+          <path d="M132 95 Q 132 110 125 115 Q 140 110 140 95 Z" fill="#00f0ff" opacity="0.8">
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="0.2s" repeatCount="indefinite"/>
+          </path>
+          
+          <!-- Rear Tires -->
+          <rect x="20" y="50" width="35" height="55" fill="#111" rx="8" stroke="#222" stroke-width="2"/>
+          <rect x="145" y="50" width="35" height="55" fill="#111" rx="8" stroke="#222" stroke-width="2"/>
+          <!-- Tire Treads -->
+          <line x1="25" y1="60" x2="50" y2="60" stroke="#000" stroke-width="3"/>
+          <line x1="25" y1="75" x2="50" y2="75" stroke="#000" stroke-width="3"/>
+          <line x1="25" y1="90" x2="50" y2="90" stroke="#000" stroke-width="3"/>
+          <line x1="150" y1="60" x2="175" y2="60" stroke="#000" stroke-width="3"/>
+          <line x1="150" y1="75" x2="175" y2="75" stroke="#000" stroke-width="3"/>
+          <line x1="150" y1="90" x2="175" y2="90" stroke="#000" stroke-width="3"/>
+
+          <!-- Spoiler -->
+          <path d="M35 30 L165 30 L175 40 L25 40 Z" fill="${color}"/>
+          <rect x="60" y="40" width="10" height="20" fill="#222"/>
+          <rect x="130" y="40" width="10" height="20" fill="#222"/>
+
+          <!-- Main Chassis Body (Rear View) -->
+          <path d="M45 55 Q 100 45 155 55 L 165 85 L 35 85 Z" fill="${color}"/>
+          
+          <!-- Driver Helmet (Simple sphere) -->
+          <circle cx="100" cy="40" r="18" fill="#fff" stroke="#ccc" stroke-width="2"/>
+          <!-- Helmet Visor -->
+          <path d="M85 38 Q 100 45 115 38 L 115 45 Q 100 52 85 45 Z" fill="#111"/>
+          
+          <!-- Tail Lights -->
+          <rect x="50" y="65" width="25" height="8" fill="#ff0000" rx="3" filter="drop-shadow(0 0 5px #ff0000)"/>
+          <rect x="125" y="65" width="25" height="8" fill="#ff0000" rx="3" filter="drop-shadow(0 0 5px #ff0000)"/>
         </svg>
       `;
     }
 
-    async function loadData() {
-      try {
-        const response = await fetch('data.json?cachebust=' + new Date().getTime());
-        const data = await response.json();
-
-        const sortedTeams = [...data.teams].sort((a, b) => b.score - a.score);
-
-        lanesList.innerHTML = '';
-        podiumCards.innerHTML = '';
-
-        sortedTeams.forEach((team, index) => {
-          const rank = index + 1;
-          const score = Math.min(Math.max(team.score, 0), 100);
-
-          // Build 3D Race Lane
-          const lane = document.createElement('div');
-          lane.className = 'lane';
-          lane.innerHTML = `
-            <div class="team-label">
-              <div class="ring-badge">${rank}</div>
-              <span>${team.name}</span>
-            </div>
-            <div class="track">
-              <div class="finish-gate"></div>
-              
-              <div class="car-positioner" style="left: calc(${score}% - ${score > 88 ? '65px' : '0px'});">
-                <div class="car-shadow"></div>
-                <div class="car-sprite">
-                  <div class="car-score-tooltip">${score}%</div>
-                  ${getSonicCarSVG(team.color)}
-                </div>
-              </div>
-
-            </div>
-          `;
-          lanesList.appendChild(lane);
-
-          // Build Flat UI Card
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.style.setProperty('--team-color', team.color);
-          card.innerHTML = `
-            <div class="team-name" style="color:${team.color}">${team.name}</div>
-            <div class="team-score">${score}%</div>
-          `;
-          podiumCards.appendChild(card);
-        });
-
-      } catch (error) {
-        console.error('Error loading JSON data:', error);
-        lanesList.innerHTML = '<p style="color:#ff0077; padding:20px; text-align:center;">Failed to load team performance data.</p>';
-      }
+    function getRankSuffix(rank) {
+      if (rank === 1) return 'st';
+      if (rank === 2) return 'nd';
+      if (rank === 3) return 'rd';
+      return 'th';
     }
 
-    loadData();
+    async function initDashboard() {
+      let data = dummyData;
+
+      try {
+        // Try fetching actual data.json
+        const response = await fetch('data.json?cachebust=' + new Date().getTime());
+        if (response.ok) {
+          data = await response.json();
+        } else {
+          console.warn("data.json not found, using dummy data.");
+        }
+      } catch (error) {
+        console.warn("Error fetching data.json, using dummy data.", error);
+      }
+
+      // Sort teams to determine ranks
+      const sortedTeams = [...data.teams].sort((a, b) => b.score - a.score);
+      
+      gridContainer.innerHTML = '';
+      minimapDotsContainer.innerHTML = '';
+
+      sortedTeams.forEach((team, index) => {
+        const rank = index + 1;
+        const score = Math.min(Math.max(team.score, 0), 100);
+        const rankSuffix = getRankSuffix(rank);
+
+        const screen = document.createElement('div');
+        screen.className = 'player-screen';
+        screen.style.setProperty('--team-color', team.color);
+
+        // We alter the road animation speed slightly based on rank to make it dynamic
+        // 1st place road moves faster
+        const animationDuration = 0.3 + (rank * 0.05);
+
+        screen.innerHTML = `
+          <div class="hud">
+            <div class="hud-top">
+              <div class="rank-indicator">${rank}<span>${rankSuffix}</span></div>
+              <div class="stats-panel">
+                <div class="team-name">${team.name}</div>
+                <div class="score-text">CSAT: ${score}%</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="scene-3d">
+            <div class="road" style="animation-duration: ${animationDuration}s;"></div>
+          </div>
+          
+          <div class="kart-wrapper">
+            ${getKartSVG(team.color)}
+          </div>
+        `;
+        gridContainer.appendChild(screen);
+
+        // Calculate position along the horizontal straight line of our minimap
+        // The path goes from x=35 to x=215 (total length 180)
+        const pathLength = 180;
+        const positionX = 35 + (pathLength * (score / 100));
+        
+        // Add dot to SVG
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("cx", positionX);
+        dot.setAttribute("cy", 35);
+        dot.setAttribute("r", "5");
+        dot.setAttribute("fill", team.color);
+        dot.setAttribute("class", "map-dot");
+        
+        // Add a pulsing halo ring
+        const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        halo.setAttribute("cx", positionX);
+        halo.setAttribute("cy", 35);
+        halo.setAttribute("r", "8");
+        halo.setAttribute("fill", "none");
+        halo.setAttribute("stroke", team.color);
+        halo.setAttribute("stroke-width", "1");
+        halo.setAttribute("opacity", "0.5");
+        
+        minimapDotsContainer.appendChild(halo);
+        minimapDotsContainer.appendChild(dot);
+      });
+    }
+
+    // Initialize on load
+    window.onload = initDashboard;
   </script>
 </body>
 </html>
