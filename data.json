@@ -1,0 +1,11 @@
+{
+  "lastUpdated": "2026-10-04",
+  "teams": [
+    { "id": 1, "name": "Team Alpha", "color": "#E63946", "score": 82 },
+    { "id": 2, "name": "Team Bravo", "color": "#1D3557", "score": 65 },
+    { "id": 3, "name": "Team Charlie", "color": "#2A9D8F", "score": 45 },
+    { "id": 4, "name": "Team Delta", "color": "#F4A261", "score": 91 },
+    { "id": 5, "name": "Team Echo", "color": "#9C27B0", "score": 30 },
+    { "id": 6, "name": "Team Foxtrot", "color": "#4CAF50", "score": 58 }
+  ]
+}
