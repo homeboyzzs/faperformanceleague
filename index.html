@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Call Center Team Leaderboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #1d3557;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    /* Board Setup */
+    #board-container {
+      position: relative;
+      width: 600px;
+      height: 600px;
+      background-color: #ffffff;
+      border: 4px solid #1d3557;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      width: 100%;
+      height: 100%;
+    }
+
+    .cell {
+      border: 1px solid #e0e0e0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #888;
+      position: relative;
+    }
+
+    .cell:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+    /* Tokens */
+    .token-container {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      max-width: 100%;
+    }
+
+    .token {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.5s ease;
+    }
+
+    /* Sidebar / Leaderboard */
+    .sidebar {
+      flex: 1;
+      min-width: 300px;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      height: fit-content;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+      color: #1d3557;
+    }
+
+    .team-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      border-left: 6px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+
+    .team-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .team-color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+    }
+
+    .team-score {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #1d3557;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Call Center Team Performance Board</h1>
+  
+  <div class="container">
+    <!-- Game Board -->
+    <div id="board-container">
+      <div id="board"></div>
+    </div>
+
+    <!-- Leaderboard Sidebar -->
+    <div class="sidebar">
+      <h2>Leaderboard</h2>
+      <div id="team-list">Loading team performance...</div>
+    </div>
+  </div>
+
+  <script>
+    const BOARD_SIZE = 10;
+    const TOTAL_CELLS = 100;
+    const boardElement = document.getElementById('board');
+    const teamListElement = document.getElementById('team-list');
+
+    // Boustrophedon (Serpentine) grid calculation
+    function getCellIndex(squareNumber) {
+      const rowFromBottom = Math.floor((squareNumber - 1) / BOARD_SIZE);
+      const col = (squareNumber - 1) % BOARD_SIZE;
+      const actualRow = BOARD_SIZE - 1 - rowFromBottom;
+      const actualCol = (rowFromBottom % 2 === 0) ? col : (BOARD_SIZE - 1 - col);
+      return { row: actualRow, col: actualCol };
+    }
+
+    // Build grid cells
+    function createBoard() {
+      boardElement.innerHTML = '';
+      for (let sq = 1; sq <= TOTAL_CELLS; sq++) {
+        const { row, col } = getCellIndex(sq);
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = `cell-${sq}`;
+        cell.innerHTML = `<span>${sq}</span><div class="token-container" id="tokens-${sq}"></div>`;
+        
+        cell.style.gridRow = row + 1;
+        cell.style.gridColumn = col + 1;
+        boardElement.appendChild(cell);
+      }
+    }
+
+    // Fetch team data from JSON and update the UI
+    async function loadPerformanceData() {
+      try {
+        const response = await fetch('data.json?cachebust=' + new Date().getTime());
+        const data = await response.json();
+
+        // Sort teams by score descending
+        const sortedTeams = [...data.teams].sort((a, b) => b.score - a.score);
+
+        // Render Leaderboard Sidebar
+        teamListElement.innerHTML = '';
+        sortedTeams.forEach(team => {
+          const card = document.createElement('div');
+          card.className = 'team-card';
+          card.style.borderLeftColor = team.color;
+          card.innerHTML = `
+            <div class="team-info">
+              <div class="team-color-dot" style="background-color: ${team.color}"></div>
+              <span>${team.name}</span>
+            </div>
+            <div class="team-score">Square ${team.score}</div>
+          `;
+          teamListElement.appendChild(card);
+
+          // Place Team Token on Board
+          const targetSquare = Math.min(Math.max(team.score, 1), 100);
+          const tokenContainer = document.getElementById(`tokens-${targetSquare}`);
+          if (tokenContainer) {
+            const token = document.createElement('div');
+            token.className = 'token';
+            token.style.backgroundColor = team.color;
+            token.title = `${team.name} (Score: ${team.score})`;
+            tokenContainer.appendChild(token);
+          }
+        });
+
+      } catch (error) {
+        console.error('Error loading JSON data:', error);
+        teamListElement.innerHTML = '<p style="color:red;">Error loading performance data.</p>';
+      }
+    }
+
+    // Initialize layout & data
+    createBoard();
+    loadPerformanceData();
+  </script>
+</body>
+</html>
