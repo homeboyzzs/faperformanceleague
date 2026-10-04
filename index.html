@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Call Center Team Leaderboard</title>
+  <title>Call Center Grand Prix Leaderboard</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,228 +13,276 @@
     }
 
     body {
-      background-color: #f4f7f6;
+      background-color: #121824;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 20px;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
     }
 
     h1 {
-      margin-bottom: 20px;
-      color: #1d3557;
-      text-align: center;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #00f2fe;
+      text-shadow: 0 0 10px rgba(0,242,254,0.5);
     }
 
-    .container {
+    p.subtitle {
+      color: #a0aec0;
+      font-size: 0.95rem;
+      margin-top: 5px;
+    }
+
+    .main-container {
       display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: center;
-      max-width: 1200px;
+      flex-direction: column;
+      gap: 20px;
       width: 100%;
+      max-width: 1100px;
     }
 
-    /* Board Setup */
-    #board-container {
-      position: relative;
-      width: 600px;
-      height: 600px;
-      background-color: #ffffff;
-      border: 4px solid #1d3557;
+    /* Racetrack Container */
+    .track-container {
+      background: #1a2234;
+      border: 2px solid #2d3748;
       border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      padding: 25px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    /* Distance Markers */
+    .distance-markers {
+      display: flex;
+      justify-content: space-between;
+      margin-left: 140px;
+      margin-right: 40px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #4a5568;
+      font-size: 11px;
+      color: #a0aec0;
+      font-weight: bold;
+    }
+
+    /* Individual Lane */
+    .lane {
+      display: flex;
+      align-items: center;
+      height: 65px;
+      border-bottom: 1px solid #2d3748;
+      position: relative;
+    }
+
+    .lane:last-child {
+      border-bottom: none;
+    }
+
+    .team-label {
+      width: 130px;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rank-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2d3748;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #fff;
+    }
+
+    /* Race Track Area */
+    .track {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: linear-gradient(90deg, #1f293d 0%, #171e2e 100%);
+      margin: 0 10px;
+      border-radius: 6px;
       overflow: hidden;
     }
 
-    #board {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      grid-template-rows: repeat(10, 1fr);
-      width: 100%;
-      height: 100%;
-    }
-
-    .cell {
-      border: 1px solid #e0e0e0;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: 4px;
-      font-size: 11px;
-      font-weight: bold;
-      color: #888;
-      position: relative;
-    }
-
-    .cell:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-
-    /* Tokens */
-    .token-container {
+    /* Finish Line Pattern */
+    .finish-line {
       position: absolute;
-      bottom: 4px;
-      right: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-      max-width: 100%;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 20px;
+      background: repeating-conic-gradient(#fff 0 90deg, #000 0 180deg) 0 0/10px 10px;
+      opacity: 0.8;
+      z-index: 1;
     }
 
-    .token {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid #ffffff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      transition: all 0.5s ease;
-    }
-
-    /* Sidebar / Leaderboard */
-    .sidebar {
-      flex: 1;
-      min-width: 300px;
-      background: #ffffff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      height: fit-content;
-    }
-
-    .sidebar h2 {
-      margin-bottom: 20px;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 10px;
-      color: #1d3557;
-    }
-
-    .team-card {
+    /* Car Wrapper */
+    .car-wrapper {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0%;
+      transition: left 1.2s cubic-bezier(0.25, 1, 0.5, 1);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      background-color: #f8f9fa;
-      border-left: 6px solid #ccc;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      z-index: 2;
     }
 
-    .team-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 600;
-      color: #333;
+    .car-svg {
+      width: 48px;
+      height: 24px;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
     }
 
-    .team-color-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-    }
-
-    .team-score {
+    .car-score-tooltip {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00f2fe;
+      color: #000;
       font-weight: bold;
-      font-size: 1.1em;
-      color: #1d3557;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* Podiums / Top 3 Styling */
+    .rank-1 .rank-badge { background: #ffd700; color: #000; font-weight: bold; }
+    .rank-2 .rank-badge { background: #c0c0c0; color: #000; font-weight: bold; }
+    .rank-3 .rank-badge { background: #cd7f32; color: #fff; font-weight: bold; }
+
+    /* Performance Stats Cards */
+    .podium-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #1a2234;
+      border: 1px solid #2d3748;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .card .team-name {
+      font-size: 14px;
+      color: #a0aec0;
+      margin-bottom: 5px;
+    }
+
+    .card .team-score {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00f2fe;
     }
   </style>
 </head>
 <body>
 
-  <h1>Call Center Team Performance Board</h1>
-  
-  <div class="container">
-    <!-- Game Board -->
-    <div id="board-container">
-      <div id="board"></div>
+  <header>
+    <h1>🏎️ Call Center Grand Prix</h1>
+    <p class="subtitle">Live Team Performance Race</p>
+  </header>
+
+  <div class="main-container">
+    <div class="track-container">
+      <div class="distance-markers">
+        <span>START (0%)</span>
+        <span>25%</span>
+        <span>50%</span>
+        <span>75%</span>
+        <span>🏁 FINISH (100%)</span>
+      </div>
+      <div id="lanes-list">Loading race tracks...</div>
     </div>
 
-    <!-- Leaderboard Sidebar -->
-    <div class="sidebar">
-      <h2>Leaderboard</h2>
-      <div id="team-list">Loading team performance...</div>
-    </div>
+    <div class="podium-cards" id="podium-cards"></div>
   </div>
 
   <script>
-    const BOARD_SIZE = 10;
-    const TOTAL_CELLS = 100;
-    const boardElement = document.getElementById('board');
-    const teamListElement = document.getElementById('team-list');
+    const lanesList = document.getElementById('lanes-list');
+    const podiumCards = document.getElementById('podium-cards');
 
-    // Boustrophedon (Serpentine) grid calculation
-    function getCellIndex(squareNumber) {
-      const rowFromBottom = Math.floor((squareNumber - 1) / BOARD_SIZE);
-      const col = (squareNumber - 1) % BOARD_SIZE;
-      const actualRow = BOARD_SIZE - 1 - rowFromBottom;
-      const actualCol = (rowFromBottom % 2 === 0) ? col : (BOARD_SIZE - 1 - col);
-      return { row: actualRow, col: actualCol };
+    // SVG Car template with customizable color
+    function getCarSVG(color) {
+      return `
+        <svg class="car-svg" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 25 L25 10 L65 10 L85 20 L95 25 L95 30 L5 30 Z" fill="${color}" />
+          <rect x="35" y="12" width="20" height="8" fill="#111" rx="2"/>
+          <circle cx="25" cy="30" r="7" fill="#333" stroke="#fff" stroke-width="2"/>
+          <circle cx="75" cy="30" r="7" fill="#333" stroke="#fff" stroke-width="2"/>
+          <path d="M85 20 L98 20 L98 23 L85 23 Z" fill="#ff0055" />
+        </svg>
+      `;
     }
 
-    // Build grid cells
-    function createBoard() {
-      boardElement.innerHTML = '';
-      for (let sq = 1; sq <= TOTAL_CELLS; sq++) {
-        const { row, col } = getCellIndex(sq);
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.id = `cell-${sq}`;
-        cell.innerHTML = `<span>${sq}</span><div class="token-container" id="tokens-${sq}"></div>`;
-        
-        cell.style.gridRow = row + 1;
-        cell.style.gridColumn = col + 1;
-        boardElement.appendChild(cell);
-      }
-    }
-
-    // Fetch team data from JSON and update the UI
-    async function loadPerformanceData() {
+    async function loadData() {
       try {
         const response = await fetch('data.json?cachebust=' + new Date().getTime());
         const data = await response.json();
 
-        // Sort teams by score descending
+        // Sort teams by score (highest rank first)
         const sortedTeams = [...data.teams].sort((a, b) => b.score - a.score);
 
-        // Render Leaderboard Sidebar
-        teamListElement.innerHTML = '';
-        sortedTeams.forEach(team => {
-          const card = document.createElement('div');
-          card.className = 'team-card';
-          card.style.borderLeftColor = team.color;
-          card.innerHTML = `
-            <div class="team-info">
-              <div class="team-color-dot" style="background-color: ${team.color}"></div>
+        lanesList.innerHTML = '';
+        podiumCards.innerHTML = '';
+
+        sortedTeams.forEach((team, index) => {
+          const rank = index + 1;
+          const score = Math.min(Math.max(team.score, 0), 100);
+
+          // Build Race Lane
+          const lane = document.createElement('div');
+          lane.className = `lane rank-${rank}`;
+          lane.innerHTML = `
+            <div class="team-label">
+              <div class="rank-badge">${rank}</div>
               <span>${team.name}</span>
             </div>
-            <div class="team-score">Square ${team.score}</div>
+            <div class="track">
+              <div class="finish-line"></div>
+              <div class="car-wrapper" style="left: calc(${score}% - ${score > 90 ? '45px' : '0px'});">
+                <div class="car-score-tooltip">${score}%</div>
+                ${getCarSVG(team.color)}
+              </div>
+            </div>
           `;
-          teamListElement.appendChild(card);
+          lanesList.appendChild(lane);
 
-          // Place Team Token on Board
-          const targetSquare = Math.min(Math.max(team.score, 1), 100);
-          const tokenContainer = document.getElementById(`tokens-${targetSquare}`);
-          if (tokenContainer) {
-            const token = document.createElement('div');
-            token.className = 'token';
-            token.style.backgroundColor = team.color;
-            token.title = `${team.name} (Score: ${team.score})`;
-            tokenContainer.appendChild(token);
-          }
+          // Build Quick Stat Card
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="team-name" style="color:${team.color}">${team.name}</div>
+            <div class="team-score">${score}%</div>
+          `;
+          podiumCards.appendChild(card);
         });
 
       } catch (error) {
         console.error('Error loading JSON data:', error);
-        teamListElement.innerHTML = '<p style="color:red;">Error loading performance data.</p>';
+        lanesList.innerHTML = '<p style="color:#ff5555; padding:20px;">Failed to load team data.</p>';
       }
     }
 
-    // Initialize layout & data
-    createBoard();
-    loadPerformanceData();
+    loadData();
   </script>
 </body>
 </html>
