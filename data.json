@@ -34,8 +34,8 @@
       "name": "Team Bravo",
       "color": "#1D3557",
       "metrics": {
-        "csat": 68,
-        "qa": 60,
+        "csat": 89,
+        "qa": 88,
         "ahtSeconds": 900
       }
     },
