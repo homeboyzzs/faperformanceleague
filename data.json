@@ -24,8 +24,8 @@
       "name": "Team Alpha",
       "color": "#E63946",
       "metrics": {
-        "csat": 62,
-        "qa": 94,
+        "csat": 67.5,
+        "qa": 96,
         "ahtSeconds": 650
       }
     },
