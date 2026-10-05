@@ -34,9 +34,9 @@
       "name": "Team Bravo",
       "color": "#1D3557",
       "metrics": {
-        "csat": 65,
-        "qa": 90,
-        "ahtSeconds": 735
+        "csat": 66,
+        "qa": 91,
+        "ahtSeconds": 734
       }
     },
     {
@@ -44,9 +44,9 @@
       "name": "Team Charlie",
       "color": "#2A9D8F",
       "metrics": {
-        "csat": 63,
+        "csat": 62,
         "qa": 88,
-        "ahtSeconds": 950
+        "ahtSeconds": 750
       }
     },
     {
@@ -54,7 +54,7 @@
       "name": "Team Delta",
       "color": "#F4A261",
       "metrics": {
-        "csat": 63,
+        "csat": 64.5,
         "qa": 90,
         "ahtSeconds": 660
       }
@@ -64,8 +64,8 @@
       "name": "Team Echo",
       "color": "#9C27B0",
       "metrics": {
-        "csat": 55,
-        "qa": 85,
+        "csat": 58,
+        "qa": 87,
         "ahtSeconds": 850
       }
     },
