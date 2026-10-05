@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#08111f">
-<title>First American Performance League</title>
+<title>Call Center League</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
@@ -141,6 +141,63 @@
   .margin-note{font-size:10px;color:#748aa0;margin-top:6px}.margin-note strong{color:#dce7f3}
   @media (max-width:700px){.event-card{padding:24px}.event-title{font-size:32px}.event-message{font-size:13px}}
 
+
+  /* ---------------- SUPABASE / STAFF AREA ---------------- */
+  .supabase-status{display:inline-flex;align-items:center;gap:7px}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:#59d88c;box-shadow:0 0 10px rgba(89,216,140,.75)}
+  .staff-btn{border:1px solid rgba(66,232,255,.22);background:rgba(66,232,255,.06);color:#bceef4;padding:9px 12px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s ease}
+  .staff-btn:hover{background:rgba(66,232,255,.11);border-color:rgba(66,232,255,.38);transform:translateY(-1px)}
+  .staff-btn.logged{border-color:rgba(89,216,140,.24);background:rgba(89,216,140,.06);color:#b8efcd}
+
+  .staff-overlay{position:fixed;inset:0;z-index:1200;background:rgba(2,7,14,.76);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease}
+  .staff-overlay.open{opacity:1;visibility:visible}
+  .staff-panel{width:min(1120px,96vw);max-height:min(90vh,940px);overflow:auto;border-radius:24px;border:1px solid rgba(166,194,220,.16);background:linear-gradient(145deg,rgba(16,33,52,.98),rgba(7,17,29,.98));box-shadow:0 30px 110px rgba(0,0,0,.65);padding:24px}
+  .staff-panel.narrow{width:min(500px,94vw)}
+  .staff-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+  .staff-title{font:800 26px "Space Grotesk";letter-spacing:-.03em;margin:0}
+  .staff-sub{color:#8fa4bd;font-size:12px;margin-top:5px;line-height:1.5}
+  .staff-head-actions{display:flex;gap:8px;align-items:center}
+  .icon-btn{width:36px;height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);color:#a6b9cd;cursor:pointer}
+  .icon-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+  .staff-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .staff-kpi{padding:12px 13px;border-radius:14px;border:1px solid rgba(166,194,220,.10);background:rgba(5,16,28,.45)}
+  .staff-kpi small{display:block;color:#71879d;font-size:9px;text-transform:uppercase;letter-spacing:.11em;margin-bottom:5px}
+  .staff-kpi strong{font:700 18px "Space Grotesk";color:#f4f8ff}
+  .staff-table-wrap{border:1px solid rgba(166,194,220,.10);border-radius:18px;overflow:auto}
+  .staff-table{width:100%;border-collapse:collapse;min-width:760px}
+  .staff-table th,.staff-table td{padding:11px 12px;border-bottom:1px solid rgba(166,194,220,.08);text-align:left;font-size:12px}
+  .staff-table th{background:rgba(255,255,255,.025);color:#7f95ac;font-size:9px;text-transform:uppercase;letter-spacing:.10em}
+  .staff-table tr:last-child td{border-bottom:0}
+  .staff-team{display:flex;align-items:center;gap:9px;font-weight:700}
+  .staff-color{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 4px rgba(255,255,255,.03)}
+  .staff-input{width:100%;padding:9px 10px;border-radius:10px;border:1px solid rgba(166,194,220,.14);background:#07131f;color:#eef6ff;outline:none}
+  .staff-input:focus{border-color:rgba(66,232,255,.42);box-shadow:0 0 0 3px rgba(66,232,255,.07)}
+  .staff-input.invalid{border-color:rgba(255,113,131,.42);box-shadow:0 0 0 3px rgba(255,113,131,.06)}
+  .staff-status-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:800;text-transform:uppercase}
+  .staff-status-chip.good{background:rgba(89,216,140,.08);border:1px solid rgba(89,216,140,.16);color:#75e9a2}
+  .staff-status-chip.warn{background:rgba(255,113,131,.08);border:1px solid rgba(255,113,131,.14);color:#ff9aa7}
+  .staff-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;flex-wrap:wrap}
+  .staff-message{font-size:11px;color:#7f95ac;min-height:18px}
+  .staff-message.success{color:#79dfa2}.staff-message.error{color:#ff9aa7}
+  .primary-btn{border:1px solid rgba(66,232,255,.28);background:linear-gradient(180deg,rgba(66,232,255,.15),rgba(66,232,255,.07));color:#d8faff;padding:10px 14px;border-radius:11px;font-weight:800;font-size:12px;cursor:pointer}
+  .primary-btn:hover{background:linear-gradient(180deg,rgba(66,232,255,.21),rgba(66,232,255,.10))}
+  .primary-btn:disabled{opacity:.55;cursor:not-allowed}
+  .secondary-btn{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);color:#b9cadb;padding:10px 14px;border-radius:11px;font-weight:700;font-size:12px;cursor:pointer}
+  .secondary-btn:hover{background:rgba(255,255,255,.06)}
+  .login-box{padding:18px;border-radius:18px;background:rgba(5,16,28,.5);border:1px solid rgba(166,194,220,.10)}
+  .login-label{display:block;color:#8fa4bd;font-size:10px;text-transform:uppercase;letter-spacing:.11em;font-weight:700;margin:0 0 7px}
+  .login-input{width:100%;padding:12px 12px;border-radius:11px;border:1px solid rgba(166,194,220,.14);background:#07131f;color:#eef6ff;outline:none;margin-bottom:13px}
+  .login-input:focus{border-color:rgba(66,232,255,.42);box-shadow:0 0 0 3px rgba(66,232,255,.07)}
+  .login-hint{font-size:10px;color:#6f859c;line-height:1.5;margin-top:9px}
+  .staff-view-note{padding:10px 12px;border-radius:12px;background:rgba(66,232,255,.04);border:1px solid rgba(66,232,255,.10);color:#7da5b6;font-size:10px;line-height:1.45;margin-bottom:16px}
+  .staff-settings{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+  .staff-setting{padding:9px 10px;border-radius:12px;background:rgba(5,16,28,.5);border:1px solid rgba(166,194,220,.08)}
+  .staff-setting small{display:block;color:#71879d;font-size:8px;text-transform:uppercase;letter-spacing:.10em}
+  .staff-setting strong{display:block;font-size:13px;margin-top:3px}
+  @media (max-width:800px){.staff-kpis{grid-template-columns:repeat(2,1fr)}.staff-settings{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:500px){.staff-panel{padding:18px}.staff-kpis{grid-template-columns:1fr 1fr}.staff-head{align-items:flex-start}.staff-title{font-size:22px}}
+
+
 </style>
 </head>
 <body>
@@ -149,7 +206,7 @@
     <div class="brand">
       <div class="brand-mark"><span>🏁</span></div>
       <div>
-        <h1>First American Performance League</h1>
+        <h1>Call Center League</h1>
         <div class="subtitle">CSAT leads the scoring. QA and AHT help each team reach the account targets.</div>
       </div>
     </div>
@@ -158,6 +215,7 @@
       <div class="pill">Weights <strong id="weightLabel">40 / 30 / 30</strong></div>
       <div class="pill">Updated <strong id="updatedLabel">—</strong></div>
       <div class="pill">Leader <strong id="leaderLabel">—</strong></div>
+      <button class="staff-btn" id="staffAccessBtn" type="button">🔐 Staff</button>
     </div>
   </header>
 
@@ -184,7 +242,7 @@
           <span><i></i> Checkpoint</span>
           <span><i style="background:#59d88c"></i> Target achieved</span>
         </div>
-        <div>Scores are calculated from <code>data.json</code></div>
+        <div>Scores are calculated from <code>Supabase</code> · data.json remains the offline fallback</div>
       </div>
       <div class="event-feed" id="eventFeed"><span class="feed-dot"></span><span id="eventFeedText">Race events will appear here.</span><button id="replayEventsBtn" type="button">Replay</button></div>
     </section>
@@ -236,6 +294,87 @@
   </section>
 </div>
 
+
+<div class="staff-overlay" id="staffLoginOverlay" aria-hidden="true">
+  <div class="staff-panel narrow">
+    <div class="staff-head">
+      <div>
+        <h2 class="staff-title">Staff Access</h2>
+        <div class="staff-sub">Enter the league control room. The public race remains visible behind this panel.</div>
+      </div>
+      <button class="icon-btn" id="staffLoginClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="login-box">
+      <label class="login-label" for="staffUsername">Username</label>
+      <input class="login-input" id="staffUsername" type="text" value="adminrace" autocomplete="username" spellcheck="false">
+      <label class="login-label" for="staffPassword">Password</label>
+      <input class="login-input" id="staffPassword" type="password" autocomplete="current-password" placeholder="Enter staff password">
+      <button class="primary-btn" id="staffLoginBtn" type="button">ENTER PADDOCK</button>
+      <div class="login-hint">There is one shared staff account for this league. The username is the friendly label; Supabase performs the real password authentication underneath.</div>
+      <div class="staff-message" id="staffLoginMessage"></div>
+    </div>
+  </div>
+</div>
+
+<div class="staff-overlay" id="staffPanelOverlay" aria-hidden="true">
+  <div class="staff-panel">
+    <div class="staff-head">
+      <div>
+        <h2 class="staff-title">🏁 Staff Control Center</h2>
+        <div class="staff-sub">Update team metrics here. The race score, targets, standings and event engine recalculate automatically after saving.</div>
+      </div>
+      <div class="staff-head-actions">
+        <button class="secondary-btn" id="staffLogoutBtn" type="button">Sign out</button>
+        <button class="icon-btn" id="staffPanelClose" type="button" aria-label="Close">×</button>
+      </div>
+    </div>
+
+    <div class="staff-kpis">
+      <div class="staff-kpi"><small>CSAT weight</small><strong id="staffKpiCsat">40%</strong></div>
+      <div class="staff-kpi"><small>QA weight</small><strong id="staffKpiQa">30%</strong></div>
+      <div class="staff-kpi"><small>AHT weight</small><strong id="staffKpiAht">30%</strong></div>
+      <div class="staff-kpi"><small>Last sync</small><strong id="staffKpiSync">—</strong></div>
+    </div>
+
+    <div class="staff-settings">
+      <div class="staff-setting"><small>CSAT target</small><strong id="staffTargetCsat">64%</strong></div>
+      <div class="staff-setting"><small>QA target</small><strong id="staffTargetQa">90%</strong></div>
+      <div class="staff-setting"><small>AHT target</small><strong id="staffTargetAht">12:15</strong></div>
+      <div class="staff-setting"><small>Scoring cap</small><strong>100%</strong></div>
+      <div class="staff-setting"><small>Teams</small><strong id="staffTeamCount">6</strong></div>
+      <div class="staff-setting"><small>History</small><strong>Automatic</strong></div>
+    </div>
+
+    <div class="staff-view-note">
+      <strong>How it works:</strong> CSAT is weighted at 40%, QA at 30%, and AHT at 30%. A metric reaches 100 points when its account target is met; overall performance stays capped at 100%. Saving a metric update also creates the next history snapshot automatically.
+    </div>
+
+    <div class="staff-table-wrap">
+      <table class="staff-table">
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>CSAT %</th>
+            <th>QA %</th>
+            <th>AHT seconds</th>
+            <th>Targets</th>
+            <th>Current performance</th>
+          </tr>
+        </thead>
+        <tbody id="staffTeamsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="staff-footer">
+      <div class="staff-message" id="staffSaveMessage"></div>
+      <div class="staff-head-actions">
+        <button class="secondary-btn" id="staffRefreshBtn" type="button">↻ Refresh</button>
+        <button class="primary-btn" id="staffSaveBtn" type="button">SAVE RESULTS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="event-toast" id="eventToast" aria-live="polite" aria-atomic="true">
   <div class="event-card" id="eventCard">
     <button class="event-close" id="eventClose" type="button" aria-label="Close event">×</button>
@@ -248,7 +387,15 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  /* Supabase configuration */
+  const SUPABASE_URL = "https://iwdimqrhuybuiudqzybw.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_rWJIr1-0Arifp6lme1oNbg_8OwJh0-V";
+  const STAFF_USERNAME = "adminrace";
+  const STAFF_EMAIL = "alexramirez4477@gmail.com";
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
   const fallbackData = {
     season: "01",
     lastUpdated: new Date().toISOString().slice(0,10),
@@ -512,14 +659,77 @@
     ];
   }
 
+  function formatUpdatedAt(value){
+    if(!value) return '—';
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return String(value);
+    return new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(d);
+  }
+
+  async function loadFromSupabase(){
+    const [{data:settingsRow,error:settingsError},{data:teamRows,error:teamsError}] = await Promise.all([
+      supabaseClient.from('league_settings').select('id,csat_weight,qa_weight,aht_weight,csat_target,qa_target,aht_target_seconds,updated_at').eq('id',1).single(),
+      supabaseClient.from('teams').select('id,name,color,csat,qa,aht_seconds,updated_at').order('id',{ascending:true})
+    ]);
+
+    if(settingsError) throw settingsError;
+    if(teamsError) throw teamsError;
+    if(!settingsRow) throw new Error('League settings not found.');
+    if(!Array.isArray(teamRows) || !teamRows.length) throw new Error('No teams found.');
+
+    const latestUpdate = teamRows.reduce((latest,row)=>{
+      const value = new Date(row.updated_at || 0).getTime();
+      return value > latest ? value : latest;
+    }, new Date(settingsRow.updated_at || 0).getTime());
+
+    return {
+      season: '01',
+      lastUpdated: Number.isFinite(latestUpdate) && latestUpdate > 0 ? new Date(latestUpdate).toISOString() : new Date().toISOString(),
+      settings: {
+        weights: {
+          csat: Number(settingsRow.csat_weight ?? 0.40),
+          qa: Number(settingsRow.qa_weight ?? 0.30),
+          aht: Number(settingsRow.aht_weight ?? 0.30)
+        },
+        targets: {
+          csat: Number(settingsRow.csat_target ?? 64),
+          qa: Number(settingsRow.qa_target ?? 90),
+          ahtSeconds: Number(settingsRow.aht_target_seconds ?? 735)
+        },
+        events: { enabled:true, toastDurationMs:6200, pollMs:30000 }
+      },
+      teams: teamRows.map(row=>({
+        id:Number(row.id),
+        name:row.name,
+        color:row.color,
+        metrics:{
+          csat:Number(row.csat),
+          qa:Number(row.qa),
+          ahtSeconds:Number(row.aht_seconds)
+        },
+        updatedAt:row.updated_at
+      }))
+    };
+  }
+
   async function loadData(){
     try{
-      const r = await fetch('data.json?cb=' + Date.now(), {cache:'no-store'});
-      if(!r.ok) throw new Error('Could not load data.json');
-      return await r.json();
+      const live = await loadFromSupabase();
+      window.__lastDataSource = 'supabase';
+      return live;
     }catch(err){
-      console.warn(err);
-      return fallbackData;
+      console.warn('Supabase load failed; using data.json fallback.', err);
+      try{
+        const r = await fetch('data.json?cb=' + Date.now(), {cache:'no-store'});
+        if(!r.ok) throw new Error('Could not load data.json');
+        const fallback = await r.json();
+        window.__lastDataSource = 'data.json';
+        return fallback;
+      }catch(fallbackErr){
+        console.warn('Fallback load failed.', fallbackErr);
+        window.__lastDataSource = 'fallback';
+        return fallbackData;
+      }
     }
   }
 
@@ -706,6 +916,284 @@
     safeSetJSON(bestKey(season),bests);
   }
 
+
+  function setOverlay(id, open){
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.classList.toggle('open',!!open);
+    el.setAttribute('aria-hidden',open?'false':'true');
+  }
+
+  function isFriendlyStaffUsername(value){
+    return String(value||'').trim().toLowerCase() === STAFF_USERNAME;
+  }
+
+  async function getCurrentSession(){
+    const {data,error}=await supabaseClient.auth.getSession();
+    if(error) throw error;
+    return data?.session || null;
+  }
+
+  async function openStaffAccess(){
+    const session = await getCurrentSession().catch(()=>null);
+    if(session?.user?.email){
+      openStaffPanel();
+      return;
+    }
+    document.getElementById('staffUsername').value = STAFF_USERNAME;
+    document.getElementById('staffPassword').value = '';
+    document.getElementById('staffLoginMessage').textContent = '';
+    document.getElementById('staffLoginMessage').className = 'staff-message';
+    setOverlay('staffLoginOverlay',true);
+    setTimeout(()=>document.getElementById('staffPassword')?.focus(),50);
+  }
+
+  async function openStaffPanel(){
+    const session = await getCurrentSession();
+    if(!session){
+      setOverlay('staffPanelOverlay',false);
+      setOverlay('staffLoginOverlay',true);
+      return;
+    }
+    setOverlay('staffLoginOverlay',false);
+    setOverlay('staffPanelOverlay',true);
+    await refreshStaffPanel();
+  }
+
+  async function loginStaff(){
+    const username = document.getElementById('staffUsername').value.trim();
+    const password = document.getElementById('staffPassword').value;
+    const msg = document.getElementById('staffLoginMessage');
+    const btn = document.getElementById('staffLoginBtn');
+
+    msg.textContent='';
+    msg.className='staff-message';
+
+    if(!isFriendlyStaffUsername(username)){
+      msg.textContent='Use the staff username: adminrace';
+      msg.className='staff-message error';
+      return;
+    }
+    if(!password){
+      msg.textContent='Enter the staff password.';
+      msg.className='staff-message error';
+      return;
+    }
+
+    btn.disabled=true;
+    btn.textContent='SIGNING IN…';
+
+    try{
+      const {data,error}=await supabaseClient.auth.signInWithPassword({
+        email: STAFF_EMAIL,
+        password
+      });
+      if(error) throw error;
+      if(!data?.session) throw new Error('No active session was returned.');
+
+      msg.textContent='Access granted.';
+      msg.className='staff-message success';
+      document.getElementById('staffPassword').value='';
+      await new Promise(resolve=>setTimeout(resolve,180));
+      await openStaffPanel();
+    }catch(err){
+      console.error(err);
+      msg.textContent='Could not sign in. Check the password and try again.';
+      msg.className='staff-message error';
+    }finally{
+      btn.disabled=false;
+      btn.textContent='ENTER PADDOCK';
+    }
+  }
+
+  async function signOutStaff(){
+    await supabaseClient.auth.signOut();
+    setOverlay('staffPanelOverlay',false);
+    updateStaffButton(false);
+  }
+
+  function updateStaffButton(isLoggedIn){
+    const btn=document.getElementById('staffAccessBtn');
+    if(!btn) return;
+    btn.classList.toggle('logged',!!isLoggedIn);
+    btn.textContent=isLoggedIn ? '🛠 Staff Panel' : '🔐 Staff';
+  }
+
+  function staffTargetsHit(team){
+    const targetCsat=Number(config.targets.csat);
+    const targetQa=Number(config.targets.qa);
+    const targetAht=Number(config.targets.ahtSeconds);
+    return [
+      Number(team.metrics.csat)>=targetCsat,
+      Number(team.metrics.qa)>=targetQa,
+      Number(team.metrics.ahtSeconds)<=targetAht
+    ].filter(Boolean).length;
+  }
+
+  function populateStaffRows(data){
+    config = {
+      weights: normalizeWeights(data.settings?.weights),
+      targets: {
+        csat: Number(data.settings?.targets?.csat ?? 64),
+        qa: Number(data.settings?.targets?.qa ?? 90),
+        ahtSeconds: Number(data.settings?.targets?.ahtSeconds ?? 735)
+      },
+      events: {
+        enabled: data.settings?.events?.enabled !== false,
+        toastDurationMs: Number(data.settings?.events?.toastDurationMs ?? 6200),
+        pollMs: Number(data.settings?.events?.pollMs ?? 30000)
+      }
+    };
+
+    document.getElementById('staffKpiCsat').textContent = `${Math.round(config.weights.csat*100)}%`;
+    document.getElementById('staffKpiQa').textContent = `${Math.round(config.weights.qa*100)}%`;
+    document.getElementById('staffKpiAht').textContent = `${Math.round(config.weights.aht*100)}%`;
+    document.getElementById('staffKpiSync').textContent = formatUpdatedAt(data.lastUpdated);
+    document.getElementById('staffTargetCsat').textContent = `${Math.round(config.targets.csat)}%`;
+    document.getElementById('staffTargetQa').textContent = `${Math.round(config.targets.qa)}%`;
+    document.getElementById('staffTargetAht').textContent = formatAHT(config.targets.ahtSeconds);
+    document.getElementById('staffTeamCount').textContent = String(data.teams?.length || 0);
+
+    const body=document.getElementById('staffTeamsBody');
+    body.innerHTML='';
+    const sorted=(data.teams||[]).slice().sort((a,b)=>a.id-b.id);
+
+    sorted.forEach(team=>{
+      const calculated=calculateTeam({
+        ...team,
+        metrics:{...team.metrics}
+      });
+      const met=staffTargetsHit(team);
+      const tr=document.createElement('tr');
+      tr.dataset.id=team.id;
+      tr.innerHTML=`
+        <td>
+          <div class="staff-team">
+            <span class="staff-color" style="background:${team.color}"></span>
+            <span>${team.name}</span>
+          </div>
+        </td>
+        <td><input class="staff-input" data-field="csat" type="number" min="0" max="100" step="0.1" value="${Number(team.metrics.csat)}"></td>
+        <td><input class="staff-input" data-field="qa" type="number" min="0" max="100" step="0.1" value="${Number(team.metrics.qa)}"></td>
+        <td><input class="staff-input" data-field="ahtSeconds" type="number" min="1" step="1" value="${Number(team.metrics.ahtSeconds)}"></td>
+        <td><span class="staff-status-chip ${met===3?'good':'warn'}">${met}/3 targets</span></td>
+        <td><strong>${oneDecimal(calculated.score)}%</strong></td>
+      `;
+      body.appendChild(tr);
+    });
+
+    body.querySelectorAll('.staff-input').forEach(input=>{
+      input.addEventListener('input',()=>input.classList.remove('invalid'));
+    });
+  }
+
+  async function refreshStaffPanel(){
+    const session=await getCurrentSession();
+    if(!session){
+      updateStaffButton(false);
+      setOverlay('staffPanelOverlay',false);
+      return;
+    }
+    updateStaffButton(true);
+    const data=await loadData();
+    if(window.__lastDataSource==='data.json'){
+      document.getElementById('staffSaveMessage').textContent='Warning: Supabase is not available. Editing is disabled until the live data source is reachable.';
+      document.getElementById('staffSaveMessage').className='staff-message error';
+      document.getElementById('staffSaveBtn').disabled=true;
+    }else{
+      document.getElementById('staffSaveMessage').textContent='';
+      document.getElementById('staffSaveMessage').className='staff-message';
+      document.getElementById('staffSaveBtn').disabled=false;
+    }
+    populateStaffRows(data);
+  }
+
+  async function saveStaffResults(){
+    const btn=document.getElementById('staffSaveBtn');
+    const msg=document.getElementById('staffSaveMessage');
+    const rows=[...document.querySelectorAll('#staffTeamsBody tr')];
+    if(!rows.length) return;
+
+    const updates=[];
+    let invalid=false;
+
+    rows.forEach(row=>{
+      const id=Number(row.dataset.id);
+      const values={id};
+      row.querySelectorAll('.staff-input').forEach(input=>{
+        const field=input.dataset.field;
+        const raw=Number(input.value);
+        const valid=field==='ahtSeconds' ? Number.isFinite(raw)&&raw>0 : Number.isFinite(raw)&&raw>=0&&raw<=100;
+        input.classList.toggle('invalid',!valid);
+        if(!valid) invalid=true;
+        values[field]=raw;
+      });
+      updates.push(values);
+    });
+
+    if(invalid){
+      msg.textContent='Please correct the highlighted values before saving.';
+      msg.className='staff-message error';
+      return;
+    }
+
+    btn.disabled=true;
+    btn.textContent='SAVING…';
+    msg.textContent='';
+    msg.className='staff-message';
+
+    try{
+      for(const update of updates){
+        const {error}=await supabaseClient.from('teams').update({
+          csat:update.csat,
+          qa:update.qa,
+          aht_seconds:update.ahtSeconds
+        }).eq('id',update.id);
+        if(error) throw error;
+      }
+
+      msg.textContent='Saved successfully. Race calculations and history were updated.';
+      msg.className='staff-message success';
+
+      const fresh=await loadData();
+      render(fresh);
+      populateStaffRows(fresh);
+    }catch(err){
+      console.error(err);
+      msg.textContent='The changes could not be saved. Check your staff session and Supabase policies.';
+      msg.className='staff-message error';
+    }finally{
+      btn.disabled=false;
+      btn.textContent='SAVE RESULTS';
+    }
+  }
+
+  function wireStaffUI(){
+    document.getElementById('staffAccessBtn').addEventListener('click',openStaffAccess);
+    document.getElementById('staffLoginClose').addEventListener('click',()=>setOverlay('staffLoginOverlay',false));
+    document.getElementById('staffPanelClose').addEventListener('click',()=>setOverlay('staffPanelOverlay',false));
+    document.getElementById('staffLoginBtn').addEventListener('click',loginStaff);
+    document.getElementById('staffPassword').addEventListener('keydown',e=>{if(e.key==='Enter') loginStaff();});
+    document.getElementById('staffLogoutBtn').addEventListener('click',signOutStaff);
+    document.getElementById('staffRefreshBtn').addEventListener('click',refreshStaffPanel);
+    document.getElementById('staffSaveBtn').addEventListener('click',saveStaffResults);
+
+    ['staffLoginOverlay','staffPanelOverlay'].forEach(id=>{
+      document.getElementById(id).addEventListener('click',e=>{
+        if(e.target.id===id) setOverlay(id,false);
+      });
+    });
+
+    supabaseClient.auth.onAuthStateChange((event,session)=>{
+      updateStaffButton(!!session);
+      if(event==='SIGNED_OUT'){
+        setOverlay('staffPanelOverlay',false);
+      }
+    });
+
+    updateStaffButton(false);
+  }
+
   function render(data){
     config = {
       weights: normalizeWeights(data.settings?.weights),
@@ -738,7 +1226,7 @@
     const leader = teams[0];
     const season=data.season || '01';
     document.getElementById('seasonLabel').textContent = season;
-    document.getElementById('updatedLabel').textContent = data.lastUpdated || '—';
+    document.getElementById('updatedLabel').textContent = formatUpdatedAt(data.lastUpdated);
     document.getElementById('weightLabel').textContent = `${Math.round(config.weights.csat*100)} / ${Math.round(config.weights.qa*100)} / ${Math.round(config.weights.aht*100)}`;
     document.getElementById('leaderLabel').textContent = leader?.name?.replace('Team ','') || '—';
     document.getElementById('leaderBadge').textContent = leader ? `${leader.name} leads at ${oneDecimal(leader.score)}%` : 'No teams';
@@ -867,10 +1355,15 @@
   document.getElementById('replayEventsBtn').addEventListener('click',()=>replayLastEvents());
 
   async function init(){
+    wireStaffUI();
     const data=await loadData();
     render(data);
     const pollMs=Math.max(15000,Number(config.events?.pollMs)||30000);
     setInterval(async()=>render(await loadData()),pollMs);
+
+    if(window.location.hash.toLowerCase()==='#staff'){
+      openStaffAccess();
+    }
   }
 
   init();
