@@ -24,9 +24,9 @@
       "name": "Team Alpha",
       "color": "#E63946",
       "metrics": {
-        "csat": 75,
-        "qa": 82,
-        "ahtSeconds": 780
+        "csat": 65.4,
+        "qa": 94,
+        "ahtSeconds": 650
       }
     },
     {
@@ -34,9 +34,9 @@
       "name": "Team Bravo",
       "color": "#1D3557",
       "metrics": {
-        "csat": 89,
-        "qa": 91,
-        "ahtSeconds": 700
+        "csat": 65,
+        "qa": 90,
+        "ahtSeconds": 735
       }
     },
     {
@@ -45,8 +45,8 @@
       "color": "#2A9D8F",
       "metrics": {
         "csat": 63,
-        "qa": 85,
-        "ahtSeconds": 1200
+        "qa": 88,
+        "ahtSeconds": 950
       }
     },
     {
@@ -54,8 +54,8 @@
       "name": "Team Delta",
       "color": "#F4A261",
       "metrics": {
-        "csat": 96,
-        "qa": 94,
+        "csat": 63,
+        "qa": 90,
         "ahtSeconds": 660
       }
     },
@@ -64,7 +64,7 @@
       "name": "Team Echo",
       "color": "#9C27B0",
       "metrics": {
-        "csat": 61,
+        "csat": 55,
         "qa": 85,
         "ahtSeconds": 850
       }
@@ -76,7 +76,7 @@
       "metrics": {
         "csat": 60,
         "qa": 52,
-        "ahtSeconds": 1000
+        "ahtSeconds": 800
       }
     }
   ]
