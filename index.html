@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#08111f">
-<title>First American League</title>
+<title>First American Performance League</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
@@ -115,6 +115,32 @@
 
   @media (max-width: 1050px){body{padding:14px}.layout{grid-template-columns:1fr}.standings{order:2}.details{order:3}}
   @media (max-width: 700px){.topbar{align-items:flex-start}.top-stats{display:none}.track-head,.lane{grid-template-columns:115px 1fr 50px;gap:7px}.track-head{padding-left:5px}.lane{padding:7px 6px}.team-name{font-size:11px}.status{font-size:9px}.rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}.car{width:49px}.score{font-size:14px}.detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}}
+
+  .event-toast{position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:rgba(2,7,14,.56);backdrop-filter:blur(5px);z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s ease}
+  .event-toast.show{opacity:1;pointer-events:auto}
+  .event-card{width:min(680px,92vw);border-radius:24px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(145deg,rgba(17,34,54,.98),rgba(7,18,31,.98));box-shadow:0 30px 100px rgba(0,0,0,.58),0 0 60px rgba(66,232,255,.08);padding:28px 30px;position:relative;overflow:hidden;transform:translateY(10px) scale(.97);transition:transform .35s cubic-bezier(.2,.85,.18,1)}
+  .event-toast.show .event-card{transform:translateY(0) scale(1)}
+  .event-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 50% 40%,rgba(66,232,255,.13),transparent 36%);pointer-events:none}
+  .event-type{position:relative;display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:rgba(66,232,255,.08);border:1px solid rgba(66,232,255,.18);color:#8ceffd;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .event-icon{font-size:26px;display:block;margin-top:16px;position:relative}
+  .event-title{position:relative;font:800 clamp(30px,5vw,54px)/1 "Space Grotesk";letter-spacing:-.045em;margin:7px 0 8px}
+  .event-title span{color:var(--cyan)}
+  .event-message{position:relative;color:#b3c5d8;font-size:14px;line-height:1.5;max-width:560px}
+  .event-progress{position:relative;height:4px;background:#122439;border-radius:99px;overflow:hidden;margin-top:22px}.event-progress i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--cyan),#fff);transform-origin:left center;animation:eventCountdown var(--event-duration,6s) linear forwards}
+  @keyframes eventCountdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+  .event-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#a6b9cd;cursor:pointer;z-index:2}.event-close:hover{background:rgba(255,255,255,.07);color:#fff}
+  .event-burst{position:absolute;inset:0;pointer-events:none;opacity:.8;background:radial-gradient(circle at 50% 58%,rgba(255,255,255,.11),transparent 15%);animation:eventBurst .9s ease-out both}
+  @keyframes eventBurst{from{transform:scale(.85);opacity:.8}to{transform:scale(1.25);opacity:0}}
+  .event-toast.overtake .event-card{border-color:rgba(66,232,255,.34)}
+  .event-toast.target .event-card{border-color:rgba(89,216,140,.34)}
+  .event-toast.warning .event-card{border-color:rgba(255,113,131,.34)}
+  .event-feed{margin-top:12px;padding:0 4px;display:flex;align-items:center;gap:9px;min-height:28px;color:#7f95ac;font-size:10px;opacity:0;transform:translateY(3px);transition:opacity .2s ease,transform .2s ease}.event-feed.visible{opacity:1;transform:translateY(0)}
+  .event-feed .feed-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);flex:0 0 auto}.event-feed strong{color:#c8d8e7}.event-feed button{margin-left:auto;border:0;background:transparent;color:#6d879f;font-size:10px;cursor:pointer}.event-feed button:hover{color:#fff}
+  .target-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.target-chip.good{color:#78e8a5;background:rgba(89,216,140,.08);border:1px solid rgba(89,216,140,.15)}.target-chip.warn{color:#ff9aa7;background:rgba(255,113,131,.08);border:1px solid rgba(255,113,131,.14)}
+  .detail-badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+  .margin-note{font-size:10px;color:#748aa0;margin-top:6px}.margin-note strong{color:#dce7f3}
+  @media (max-width:700px){.event-card{padding:24px}.event-title{font-size:32px}.event-message{font-size:13px}}
+
 </style>
 </head>
 <body>
@@ -123,7 +149,7 @@
     <div class="brand">
       <div class="brand-mark"><span>🏁</span></div>
       <div>
-        <h1>First American League</h1>
+        <h1>First American Performance League</h1>
         <div class="subtitle">CSAT leads the scoring. QA and AHT help each team reach the account targets.</div>
       </div>
     </div>
@@ -160,6 +186,7 @@
         </div>
         <div>Scores are calculated from <code>data.json</code></div>
       </div>
+      <div class="event-feed" id="eventFeed"><span class="feed-dot"></span><span id="eventFeedText">Race events will appear here.</span><button id="replayEventsBtn" type="button">Replay</button></div>
     </section>
 
     <aside class="panel standings">
@@ -209,13 +236,26 @@
   </section>
 </div>
 
+<div class="event-toast" id="eventToast" aria-live="polite" aria-atomic="true">
+  <div class="event-card" id="eventCard">
+    <button class="event-close" id="eventClose" type="button" aria-label="Close event">×</button>
+    <div class="event-type" id="eventType">LIVE RACE EVENT</div>
+    <div class="event-icon" id="eventIcon">🏎️</div>
+    <div class="event-title" id="eventTitle">OVERTAKE!</div>
+    <div class="event-message" id="eventMessage">A new race event has been detected.</div>
+    <div class="event-progress"><i id="eventProgress"></i></div>
+    <div class="event-burst"></div>
+  </div>
+</div>
+
 <script>
   const fallbackData = {
     season: "01",
     lastUpdated: new Date().toISOString().slice(0,10),
     settings: {
       weights: { csat: 0.40, qa: 0.30, aht: 0.30 },
-      targets: { csat: 64, qa: 90, ahtSeconds: 735 }
+      targets: { csat: 64, qa: 90, ahtSeconds: 735 },
+      events: { enabled: true, toastDurationMs: 6200, pollMs: 30000 }
     },
     teams: [
       {id:1,name:"Team Alpha",color:"#E63946",metrics:{csat:87,qa:82,ahtSeconds:780}},
@@ -230,6 +270,15 @@
   let teams = [];
   let config = fallbackData.settings;
   let selectedId = null;
+  let eventQueue = [];
+  let activeEventTimer = null;
+  let replayableEvents = [];
+
+  const STORAGE = {
+    snapshot: 'ccl_last_snapshot_v1',
+    seen: 'ccl_seen_events_v1',
+    bests: 'ccl_personal_bests_v1'
+  };
 
   function clamp(n,min,max){
     const value = Number(n);
@@ -279,10 +328,27 @@
       const actual = Number(m.ahtSeconds);
       const target = Math.max(1, Number(targets.ahtSeconds) || 1);
       if(!Number.isFinite(actual) || actual <= 0) return 0;
-      // Lower AHT is better: meeting or beating target earns the full 100 points.
       return clamp((target / actual) * 100, 0, 100);
     }
 
+    return 0;
+  }
+
+  function rawMetricRatio(team,key){
+    const m = team.metrics || {};
+    const targets = config.targets || {csat:64, qa:90, ahtSeconds:735};
+    if(key==='csat'){
+      const actual=Number(m.csat), target=Math.max(0.01,Number(targets.csat)||1);
+      return Number.isFinite(actual)&&actual>=0 ? actual/target : 0;
+    }
+    if(key==='qa'){
+      const actual=Number(m.qa), target=Math.max(0.01,Number(targets.qa)||1);
+      return Number.isFinite(actual)&&actual>=0 ? actual/target : 0;
+    }
+    if(key==='aht'){
+      const actual=Number(m.ahtSeconds), target=Math.max(1,Number(targets.ahtSeconds)||1);
+      return Number.isFinite(actual)&&actual>0 ? target/actual : 0;
+    }
     return 0;
   }
 
@@ -338,14 +404,20 @@
   }
 
   function calculateTeam(team){
+    const csatRatio = rawMetricRatio(team,'csat');
+    const qaRatio = rawMetricRatio(team,'qa');
+    const ahtRatio = rawMetricRatio(team,'aht');
+    const rawPerformance = (csatRatio*config.weights.csat + qaRatio*config.weights.qa + ahtRatio*config.weights.aht) * 100;
     const csat = metricScore(team,'csat');
     const qa = metricScore(team,'qa');
     const aht = metricScore(team,'aht');
-    const score = csat*config.weights.csat + qa*config.weights.qa + aht*config.weights.aht;
+    const score = clamp(rawPerformance,0,100);
     const targetsHit = targetCount(team);
     return {
       ...team,
-      score: clamp(score,0,100),
+      score,
+      rawPerformance,
+      targetMargin: Math.max(rawPerformance-100,0),
       metricScores: {csat,qa,aht},
       targetsHit,
       allTargetsMet: targetsHit === 3,
@@ -400,6 +472,189 @@
     }
   }
 
+  function safeGetJSON(key,fallback){
+    try{
+      const raw=localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    }catch{return fallback;}
+  }
+
+  function safeSetJSON(key,value){
+    try{localStorage.setItem(key,JSON.stringify(value));}catch{}
+  }
+
+  function makeSnapshot(sortedTeams){
+    return {
+      season: fallbackData.season,
+      order: sortedTeams.map(t=>t.id),
+      teams: Object.fromEntries(sortedTeams.map((t,index)=>[String(t.id),{
+        rank:index+1,
+        score:Number(t.score.toFixed(4)),
+        rawPerformance:Number(t.rawPerformance.toFixed(4)),
+        targetsHit:t.targetsHit,
+        allTargetsMet:t.allTargetsMet
+      }]))
+    };
+  }
+
+  function snapshotKey(season){ return `${STORAGE.snapshot}_${season}`; }
+  function seenKey(season){ return `${STORAGE.seen}_${season}`; }
+  function bestKey(season){ return `${STORAGE.bests}_${season}`; }
+
+  function currentSnapshotFor(sortedTeams,season){
+    const snap=makeSnapshot(sortedTeams);
+    snap.season=season;
+    return snap;
+  }
+
+  function eventId(type, parts, dataStamp){
+    return [dataStamp||'no-date',type,...parts].join('|');
+  }
+
+  function buildRaceEvents(previous,current,data){
+    if(!previous || previous.season !== current.season) return [];
+    const prevOrder=previous.order||[];
+    const currOrder=current.order||[];
+    const prevMap=previous.teams||{};
+    const currMap=current.teams||{};
+    const byId=Object.fromEntries(teams.map(t=>[t.id,t]));
+    const events=[];
+    const stamp=data.lastUpdated || new Date().toISOString();
+
+    // Overtake events: each team is credited for the teams it crossed.
+    currOrder.forEach((id,newIndex)=>{
+      const oldIndex=prevOrder.indexOf(id);
+      if(oldIndex<0 || newIndex>=oldIndex) return;
+      const passed=prevOrder.slice(newIndex,oldIndex).filter(otherId=>otherId!==id);
+      passed.forEach(passedId=>{
+        const overtaker=byId[id], passedTeam=byId[passedId];
+        if(!overtaker || !passedTeam) return;
+        events.push({
+          id:eventId('overtake',[id,passedId,current.teams[id]?.score,current.teams[passedId]?.score],stamp),
+          type:'overtake',icon:'🚨',label:'OVERTAKE!',
+          title:`${overtaker.name} <span>passed</span> ${passedTeam.name}`,
+          message:`The new standings put ${overtaker.name} ahead of ${passedTeam.name}.`,
+          teamId:id
+        });
+      });
+    });
+
+    // New leader, kept separate from an overtake so the moment feels special.
+    const prevLeader=prevOrder[0], currLeader=currOrder[0];
+    if(prevLeader && currLeader && prevLeader!==currLeader){
+      const leader=byId[currLeader];
+      if(leader){
+        events.push({
+          id:eventId('new_leader',[currLeader],stamp),
+          type:'overtake',icon:'🏆',label:'NEW LEADER',
+          title:`${leader.name} <span>takes P1</span>`,
+          message:`${leader.name} is now leading the championship at ${oneDecimal(currMap[currLeader].score)}%.`,
+          teamId:currLeader
+        });
+      }
+    }
+
+    // Target changes.
+    currOrder.forEach(id=>{
+      const prev=prevMap[id], now=currMap[id], team=byId[id];
+      if(!prev || !now || !team) return;
+      if(!prev.allTargetsMet && now.allTargetsMet){
+        events.push({
+          id:eventId('target_master',[id],stamp),type:'target',icon:'🏆',label:'TARGET MASTER',
+          title:`${team.name} <span>hit all 3 targets</span>`,
+          message:`CSAT, QA and AHT are all on target. The team has reached Target Mastery.`,teamId:id
+        });
+      }else if(prev.allTargetsMet && !now.allTargetsMet){
+        events.push({
+          id:eventId('target_lost',[id],stamp),type:'warning',icon:'⚠️',label:'TARGET LOST',
+          title:`${team.name} <span>left Target Mastery</span>`,
+          message:`One or more account targets are no longer being met.`,teamId:id
+        });
+      }
+    });
+
+    // Biggest improvement since the last snapshot.
+    let best=null;
+    currOrder.forEach(id=>{
+      const prev=prevMap[id], now=currMap[id], team=byId[id];
+      if(!prev || !now || !team) return;
+      const delta=now.score-prev.score;
+      if(!best || delta>best.delta) best={id,delta,team,now,prev};
+    });
+    if(best && best.delta >= 3){
+      events.push({
+        id:eventId('hot_lap',[best.id,best.prev.score,best.now.score],stamp),type:'overtake',icon:'🔥',label:'HOT LAP',
+        title:`${best.team.name} <span>+${oneDecimal(best.delta)} points</span>`,
+        message:`Biggest performance gain since the last update.`,teamId:best.id
+      });
+    }
+
+    return events;
+  }
+
+  function filterUnseen(events,season){
+    const seen=new Set(safeGetJSON(seenKey(season),[]));
+    const fresh=events.filter(e=>!seen.has(e.id));
+    fresh.forEach(e=>seen.add(e.id));
+    safeSetJSON(seenKey(season),[...seen].slice(-250));
+    replayableEvents=fresh.slice();
+    return fresh;
+  }
+
+  function showNextEvent(){
+    if(activeEventTimer) clearTimeout(activeEventTimer);
+    const event=eventQueue.shift();
+    if(!event){
+      document.getElementById('eventToast').classList.remove('show');
+      return;
+    }
+    const toast=document.getElementById('eventToast');
+    const card=document.getElementById('eventCard');
+    toast.className='event-toast show ' + (event.type||'overtake');
+    document.getElementById('eventType').textContent=event.label||'LIVE RACE EVENT';
+    document.getElementById('eventIcon').textContent=event.icon||'🏎️';
+    document.getElementById('eventTitle').innerHTML=event.title||'';
+    document.getElementById('eventMessage').textContent=event.message||'';
+    const duration=Math.max(2800,Number(config.events?.toastDurationMs)||6200);
+    document.getElementById('eventProgress').style.setProperty('--event-duration',duration+'ms');
+    // Force animation restart.
+    const progress=document.getElementById('eventProgress');
+    progress.style.animation='none';
+    progress.offsetHeight;
+    progress.style.animation=`eventCountdown ${duration}ms linear forwards`;
+    activeEventTimer=setTimeout(()=>showNextEvent(),duration);
+  }
+
+  function queueEvents(events, replay=false){
+    eventQueue = events.slice();
+    if(replay) replayableEvents=events.slice();
+    if(eventQueue.length){
+      updateFeed(eventQueue[0],eventQueue.length);
+      showNextEvent();
+    }
+  }
+
+  function updateFeed(event,count=1){
+    const feed=document.getElementById('eventFeed');
+    if(!event){feed.classList.remove('visible');return;}
+    document.getElementById('eventFeedText').innerHTML=`<strong>${event.label}</strong> ${event.title.replace(/<[^>]*>/g,'')}${count>1 ? ` · +${count-1} more` : ''}`;
+    feed.classList.add('visible');
+  }
+
+  function replayLastEvents(){
+    if(!replayableEvents.length) return;
+    queueEvents(replayableEvents,true);
+  }
+
+  function updatePersonalBests(sortedTeams,season){
+    const bests=safeGetJSON(bestKey(season),{});
+    sortedTeams.forEach(t=>{
+      const previous=Number(bests[t.id]);
+      if(!Number.isFinite(previous) || t.score>previous) bests[t.id]=Number(t.score.toFixed(3));
+    });
+    safeSetJSON(bestKey(season),bests);
+  }
+
   function render(data){
     config = {
       weights: normalizeWeights(data.settings?.weights),
@@ -407,12 +662,20 @@
         csat: Number(data.settings?.targets?.csat ?? 64),
         qa: Number(data.settings?.targets?.qa ?? 90),
         ahtSeconds: Number(data.settings?.targets?.ahtSeconds ?? 735)
+      },
+      events: {
+        enabled: data.settings?.events?.enabled !== false,
+        toastDurationMs: Number(data.settings?.events?.toastDurationMs ?? 6200),
+        pollMs: Number(data.settings?.events?.pollMs ?? 30000)
       }
     };
 
     teams = (data.teams || [])
       .map(calculateTeam)
-      .sort((a,b) => b.score - a.score);
+      .sort((a,b) => {
+        if(Math.abs(b.score-a.score)>0.0001) return b.score-a.score;
+        return b.rawPerformance-a.rawPerformance;
+      });
 
     const lanes = document.getElementById('lanes');
     const standings = document.getElementById('standingList');
@@ -422,7 +685,8 @@
     if(selectedId === null || !teams.some(t => t.id === selectedId)) selectedId = teams[0]?.id ?? null;
 
     const leader = teams[0];
-    document.getElementById('seasonLabel').textContent = data.season || '01';
+    const season=data.season || '01';
+    document.getElementById('seasonLabel').textContent = season;
     document.getElementById('updatedLabel').textContent = data.lastUpdated || '—';
     document.getElementById('weightLabel').textContent = `${Math.round(config.weights.csat*100)} / ${Math.round(config.weights.qa*100)} / ${Math.round(config.weights.aht*100)}`;
     document.getElementById('leaderLabel').textContent = leader?.name?.replace('Team ','') || '—';
@@ -438,7 +702,7 @@
         <div class="lane-meta">
           <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
           <span class="team-dot" style="background:${team.color}"></span>
-          <div><div class="team-name">${team.name}</div><div class="status">${statusFor(team)} · ${team.targetsHit}/3 targets</div></div>
+          <div><div class="team-name">${team.name}</div><div class="status">${statusFor(team)} · ${team.targetsHit}/3 targets${team.allTargetsMet?' · 🏆':''}</div></div>
         </div>
         <div class="track">
           <div class="checkpoint c25"><b>25</b></div><div class="checkpoint c50"><b>50</b></div><div class="checkpoint c75"><b>75</b></div><div class="checkpoint c100"><b>100</b></div>
@@ -456,7 +720,7 @@
         <div class="rank ${rank===1?'r1':rank===2?'r2':rank===3?'r3':''}">${rank}</div>
         <div class="stand-team">
           <strong>${team.name}</strong>
-          <div class="stand-sub">${statusFor(team)} · ${team.targetsHit}/3 targets</div>
+          <div class="stand-sub">${statusFor(team)} · ${team.targetsHit}/3 targets${team.targetMargin>0?` · +${oneDecimal(team.targetMargin)} margin`:''}</div>
           <div class="mini-progress"><i style="width:${team.score}%;background:${team.color}"></i></div>
         </div>
         <div class="stand-score">${oneDecimal(team.score)}%</div>
@@ -473,6 +737,16 @@
     });
 
     updateSelectedDetails();
+
+    const current=currentSnapshotFor(teams,season);
+    const previous=safeGetJSON(snapshotKey(season),null);
+    safeSetJSON(snapshotKey(season),current);
+    updatePersonalBests(teams,season);
+
+    if(config.events.enabled && previous){
+      const fresh=filterUnseen(buildRaceEvents(previous,current,data),season);
+      if(fresh.length) queueEvents(fresh);
+    }
   }
 
   function selectTeam(id){
@@ -495,7 +769,7 @@
 
     document.getElementById('detailName').textContent=team.name;
     document.getElementById('detailMeta').textContent=`${statusFor(team)} · ${rankText} in the league · ${team.targetsHit}/3 targets`;
-    document.getElementById('detailStatus').textContent=`${team.targetsHit}/3 targets`;
+    document.getElementById('detailStatus').innerHTML=team.allTargetsMet ? '<span class="target-chip good">🏆 Target Master</span>' : `<span class="target-chip ${team.targetsHit>=2?'good':'warn'}">${team.targetsHit}/3 targets</span>`;
     document.getElementById('selectedRank').textContent=`${rankText} place · weighted score`;
     document.getElementById('detailScore').textContent=oneDecimal(team.score);
     document.getElementById('detailDot').style.background=team.color;
@@ -507,7 +781,15 @@
 
     [25,50,75,100].forEach(m=>document.getElementById('m'+m).classList.toggle('done',team.score>=m));
 
-    document.getElementById('targetNote').textContent=`Targets: CSAT ${Math.round(config.targets.csat)}% · QA ${Math.round(config.targets.qa)}% · AHT ${formatAHT(config.targets.ahtSeconds)}. Meeting the target earns 100 points for that metric.`;
+    document.getElementById('targetNote').textContent=`Targets: CSAT ${Math.round(config.targets.csat)}% · QA ${Math.round(config.targets.qa)}% · AHT ${formatAHT(config.targets.ahtSeconds)}. Meeting the target earns 100 points for that metric; overall performance is capped at 100%.`;
+
+    const marginNote=document.getElementById('detailName').parentElement.querySelector('.detail-badges');
+    if(marginNote) marginNote.remove();
+    if(team.allTargetsMet){
+      const badges=document.createElement('div'); badges.className='detail-badges';
+      badges.innerHTML=`<span class="target-chip good">🏆 3 / 3 targets</span><span class="target-chip good">🔥 +${oneDecimal(team.targetMargin)} target margin</span>`;
+      document.getElementById('detailName').parentElement.appendChild(badges);
+    }
 
     const metricList=document.getElementById('metricList');
     metricList.innerHTML = metricConfigRows(team).map(metric=>`
@@ -523,13 +805,24 @@
     `).join('');
   }
 
+  document.getElementById('eventClose').addEventListener('click',()=>{
+    if(activeEventTimer) clearTimeout(activeEventTimer);
+    eventQueue=[];
+    document.getElementById('eventToast').classList.remove('show');
+  });
+  document.getElementById('eventToast').addEventListener('click',e=>{
+    if(e.target.id==='eventToast') document.getElementById('eventClose').click();
+  });
+  document.getElementById('replayEventsBtn').addEventListener('click',()=>replayLastEvents());
+
   async function init(){
     const data=await loadData();
     render(data);
+    const pollMs=Math.max(15000,Number(config.events?.pollMs)||30000);
+    setInterval(async()=>render(await loadData()),pollMs);
   }
 
   init();
-  setInterval(async()=>render(await loadData()),30000);
 </script>
 </body>
 </html>
