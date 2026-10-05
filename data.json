@@ -11,6 +11,11 @@
       "csat": 64,
       "qa": 90,
       "ahtSeconds": 735
+    },
+    "events": {
+      "enabled": true,
+      "toastDurationMs": 6200,
+      "pollMs": 30000
     }
   },
   "teams": [
