@@ -34,9 +34,9 @@
       "name": "Team Bravo",
       "color": "#1D3557",
       "metrics": {
-        "csat": 66,
-        "qa": 91,
-        "ahtSeconds": 734
+        "csat": 62,
+        "qa": 90,
+        "ahtSeconds": 735
       }
     },
     {
@@ -74,9 +74,9 @@
       "name": "Team Foxtrot",
       "color": "#4CAF50",
       "metrics": {
-        "csat": 60,
-        "qa": 85,
-        "ahtSeconds": 895
+        "csat": 68,
+        "qa": 89,
+        "ahtSeconds": 800
       }
     }
   ]
