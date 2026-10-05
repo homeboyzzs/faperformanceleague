@@ -44,8 +44,8 @@
       "name": "Team Charlie",
       "color": "#2A9D8F",
       "metrics": {
-        "csat": 47,
-        "qa": 43,
+        "csat": 63,
+        "qa": 85,
         "ahtSeconds": 1200
       }
     },
