@@ -64,9 +64,9 @@
       "name": "Team Echo",
       "color": "#9C27B0",
       "metrics": {
-        "csat": 35,
-        "qa": 25,
-        "ahtSeconds": 1800
+        "csat": 61,
+        "qa": 85,
+        "ahtSeconds": 850
       }
     },
     {
