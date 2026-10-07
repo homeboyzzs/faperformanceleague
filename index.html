@@ -114,7 +114,7 @@
   .footer{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;color:#71879d;font-size:10px}.legend{display:flex;gap:14px;flex-wrap:wrap}.legend span{display:flex;gap:5px;align-items:center}.legend i{width:7px;height:7px;border-radius:50%;background:#51667e}.legend i.cyan{background:var(--cyan)}
 
   @media (max-width: 1050px){body{padding:14px}.layout{grid-template-columns:1fr}.standings{order:2}.details{order:3}}
-  @media (max-width: 700px){.topbar{align-items:flex-start}.top-stats{display:none}.track-head,.lane{grid-template-columns:115px 1fr 50px;gap:7px}.track-head{padding-left:5px}.lane{padding:7px 6px;min-height:78px}.team-name{font-size:11px}.status{font-size:9px}.rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}.car{width:72px;height:39px}.score{font-size:14px}.detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width: 700px){.topbar{align-items:flex-start}.top-stats{display:none}.track-head,.lane{grid-template-columns:92px minmax(0,1fr) 44px;gap:6px}.track-head{padding:0 6px 6px}.track-head{font-size:8px;letter-spacing:.07em}.scale{height:18px;min-width:0}.scale span{white-space:nowrap}.lane{padding:7px 6px;min-height:78px}.lane-meta{gap:6px}.team-name{font-size:10.5px}.status{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}.car{width:72px;height:39px}.score{font-size:14px}.detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}}
 
   .event-toast{position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:rgba(2,7,14,.56);backdrop-filter:blur(5px);z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s ease}
   .event-toast.show{opacity:1;pointer-events:auto}
@@ -340,7 +340,7 @@
       <div class="staff-setting"><small>QA target</small><strong id="staffTargetQa">90%</strong></div>
       <div class="staff-setting"><small>AHT target</small><strong id="staffTargetAht">12:15</strong></div>
       <div class="staff-setting"><small>Scoring cap</small><strong>100%</strong></div>
-      <div class="staff-setting"><small>Teams</small><strong id="staffTeamCount">6</strong></div>
+      <div class="staff-setting"><small>Teams</small><strong id="staffTeamCount">7</strong></div>
       <div class="staff-setting"><small>History</small><strong>Automatic</strong></div>
     </div>
 
@@ -404,12 +404,13 @@
       events: { enabled: true, toastDurationMs: 6200, pollMs: 30000 }
     },
     teams: [
-      {id:1,name:"Team Alpha",color:"#E63946",metrics:{csat:87,qa:82,ahtSeconds:780}},
-      {id:2,name:"Team Bravo",color:"#1D3557",metrics:{csat:68,qa:60,ahtSeconds:900}},
-      {id:3,name:"Team Charlie",color:"#2A9D8F",metrics:{csat:47,qa:43,ahtSeconds:1200}},
-      {id:4,name:"Team Delta",color:"#F4A261",metrics:{csat:96,qa:94,ahtSeconds:660}},
-      {id:5,name:"Team Echo",color:"#9C27B0",metrics:{csat:35,qa:25,ahtSeconds:1800}},
-      {id:6,name:"Team Foxtrot",color:"#4CAF50",metrics:{csat:60,qa:52,ahtSeconds:1000}}
+      {id:1,name:"NO TV Team",color:"#E63946",metrics:{csat:0,qa:0,ahtSeconds:0}},
+      {id:2,name:"404 Not Found",color:"#1D3557",metrics:{csat:0,qa:0,ahtSeconds:0}},
+      {id:3,name:"Team Olimpia",color:"#2A9D8F",metrics:{csat:0,qa:0,ahtSeconds:0}},
+      {id:4,name:"Amargos Team",color:"#F4A261",metrics:{csat:0,qa:0,ahtSeconds:0}},
+      {id:5,name:"Yovis Team",color:"#9C27B0",metrics:{csat:0,qa:0,ahtSeconds:0}},
+      {id:6,name:"Intuicion Team",color:"#4CAF50",metrics:{csat:0,qa:0,ahtSeconds:0}},
+      {id:7,name:"Team Alpha",color:"#00B4D8",metrics:{csat:0,qa:0,ahtSeconds:0}}
     ]
   };
 
@@ -423,7 +424,8 @@
   const STORAGE = {
     snapshot: 'ccl_last_snapshot_v1',
     seen: 'ccl_seen_events_v1',
-    bests: 'ccl_personal_bests_v1'
+    bests: 'ccl_personal_bests_v1',
+    replay: 'ccl_replay_events_v1'
   };
 
   function clamp(n,min,max){
@@ -760,6 +762,7 @@
   function snapshotKey(season){ return `${STORAGE.snapshot}_${season}`; }
   function seenKey(season){ return `${STORAGE.seen}_${season}`; }
   function bestKey(season){ return `${STORAGE.bests}_${season}`; }
+  function replayKey(season){ return `${STORAGE.replay}_${season}`; }
 
   function currentSnapshotFor(sortedTeams,season){
     const snap=makeSnapshot(sortedTeams);
@@ -857,7 +860,13 @@
     const fresh=events.filter(e=>!seen.has(e.id));
     fresh.forEach(e=>seen.add(e.id));
     safeSetJSON(seenKey(season),[...seen].slice(-250));
-    replayableEvents=fresh.slice();
+
+    // Keep the most recent event batch available for Replay, even after a refresh
+    // or a later polling cycle that produces no new events.
+    if(fresh.length){
+      replayableEvents=fresh.slice();
+      safeSetJSON(replayKey(season),replayableEvents);
+    }
     return fresh;
   }
 
@@ -1224,6 +1233,7 @@
 
     const leader = teams[0];
     const season=data.season || '01';
+    replayableEvents=safeGetJSON(replayKey(season),replayableEvents);
     document.getElementById('seasonLabel').textContent = season;
     document.getElementById('updatedLabel').textContent = formatUpdatedAt(data.lastUpdated);
     document.getElementById('weightLabel').textContent = `${Math.round(config.weights.csat*100)} / ${Math.round(config.weights.qa*100)} / ${Math.round(config.weights.aht*100)}`;
