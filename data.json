@@ -1,6 +1,6 @@
 {
   "season": "01",
-  "lastUpdated": "2026-10-04",
+  "lastUpdated": "2026-10-07",
   "settings": {
     "weights": {
       "csat": 0.4,
@@ -21,62 +21,72 @@
   "teams": [
     {
       "id": 1,
-      "name": "Team Alpha",
+      "name": "NO TV Team",
       "color": "#E63946",
       "metrics": {
-        "csat": 87,
-        "qa": 82,
-        "ahtSeconds": 780
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
       }
     },
     {
       "id": 2,
-      "name": "Team Bravo",
+      "name": "404 Not Found",
       "color": "#1D3557",
       "metrics": {
-        "csat": 68,
-        "qa": 60,
-        "ahtSeconds": 900
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
       }
     },
     {
       "id": 3,
-      "name": "Team Charlie",
+      "name": "Team Olimpia",
       "color": "#2A9D8F",
       "metrics": {
-        "csat": 47,
-        "qa": 43,
-        "ahtSeconds": 1200
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
       }
     },
     {
       "id": 4,
-      "name": "Team Delta",
+      "name": "Amargos Team",
       "color": "#F4A261",
       "metrics": {
-        "csat": 96,
-        "qa": 94,
-        "ahtSeconds": 660
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
       }
     },
     {
       "id": 5,
-      "name": "Team Echo",
+      "name": "Yovis Team",
       "color": "#9C27B0",
       "metrics": {
-        "csat": 35,
-        "qa": 25,
-        "ahtSeconds": 1800
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
       }
     },
     {
       "id": 6,
-      "name": "Team Foxtrot",
+      "name": "Intuicion Team",
       "color": "#4CAF50",
       "metrics": {
-        "csat": 60,
-        "qa": 52,
-        "ahtSeconds": 1000
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
+      }
+    },
+    {
+      "id": 7,
+      "name": "Team Alpha",
+      "color": "#00B4D8",
+      "metrics": {
+        "csat": 0,
+        "qa": 0,
+        "ahtSeconds": 0
       }
     }
   ],
