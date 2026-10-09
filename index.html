@@ -106,6 +106,18 @@
   .metric-row.aht .metric-values{font-size:11px}
 
   .milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+
+  .average-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+  .average-metric{padding:10px 11px;border-radius:12px;background:rgba(5,16,28,.58);border:1px solid var(--metric-border);min-width:0}
+  .average-metric-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .average-metric-label{font-size:10px;color:#9bb0c6;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .average-metric-status{font-size:8px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+  .average-metric-value{font:800 22px "Space Grotesk";line-height:1.2;margin-top:7px;color:var(--metric-color)}
+  .average-metric-target{font-size:9px;color:#8298af;margin-top:4px}
+  .average-metric.good{--metric-color:#59d88c;--metric-border:rgba(89,216,140,.3);background:rgba(89,216,140,.055)}
+  .average-metric.near{--metric-color:#ffd45a;--metric-border:rgba(255,212,90,.3);background:rgba(255,212,90,.045)}
+  .average-metric.low{--metric-color:#ff7183;--metric-border:rgba(255,113,131,.3);background:rgba(255,113,131,.045)}
+  .average-metric-status{color:var(--metric-color)}
   .milestone{padding:9px 8px;border-radius:12px;background:rgba(5,16,28,.58);border:1px solid rgba(159,188,216,.08);text-align:center}.milestone b{display:block;font-size:12px}.milestone span{font-size:9px;color:#748ca4}.milestone.done{border-color:rgba(89,216,140,.25);background:rgba(89,216,140,.06)}.milestone.done b{color:var(--green)}
 
   .formula{margin-top:12px;font-size:10px;color:#7088a0}.formula strong{color:#b9cbe0}
@@ -114,6 +126,7 @@
   .footer{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;color:#71879d;font-size:10px}.legend{display:flex;gap:14px;flex-wrap:wrap}.legend span{display:flex;gap:5px;align-items:center}.legend i{width:7px;height:7px;border-radius:50%;background:#51667e}.legend i.cyan{background:var(--cyan)}
 
   @media (max-width: 1050px){body{padding:14px}.layout{grid-template-columns:1fr}.standings{order:2}.details{order:3}}
+  @media (max-width: 700px){.average-metrics{grid-template-columns:1fr}.average-metric{padding:9px 10px}.average-metric-value{font-size:20px}}
   @media (max-width: 700px){.topbar{align-items:flex-start}.top-stats{display:none}.track-head,.lane{grid-template-columns:92px minmax(0,1fr) 44px;gap:6px}.track-head{padding:0 6px 6px}.track-head{font-size:8px;letter-spacing:.07em}.scale{height:18px;min-width:0}.scale span{white-space:nowrap}.lane{padding:7px 6px;min-height:78px}.lane-meta{gap:6px}.team-name{font-size:10.5px}.status{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank{width:24px;height:24px;border-radius:8px;font-size:10px}.team-dot{display:none}.car{width:72px;height:39px}.score{font-size:14px}.detail-grid{grid-template-columns:1fr}.milestones{grid-template-columns:repeat(2,1fr)}}
 
   .event-toast{position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:rgba(2,7,14,.56);backdrop-filter:blur(5px);z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s ease}
@@ -280,6 +293,7 @@
             <div class="milestone" id="m75"><b>75%</b><span>Sprint</span></div>
             <div class="milestone" id="m100"><b>100%</b><span>Finish</span></div>
           </div>
+          <div class="average-metrics" id="averageMetrics" aria-label="Current team metric averages"></div>
           <div class="formula">Performance = <strong>CSAT × 40%</strong> + <strong>QA × 30%</strong> + <strong>AHT Score × 30%</strong></div>
           <div class="config-note" id="targetNote">Target scoring: reaching the account target earns 100 points for that metric; results below target are scaled proportionally.</div>
         </div>
@@ -1309,6 +1323,52 @@
     updateSelectedDetails();
   }
 
+  function averageMetricStatus(team,key){
+    const m=team.metrics||{};
+    const targets=config.targets||{csat:64,qa:90,ahtSeconds:735};
+    if(key==='csat'){
+      const actual=Number(m.csat), target=Number(targets.csat);
+      if(actual>=target) return 'good';
+      if(actual>=target-3) return 'near';
+      return 'low';
+    }
+    if(key==='qa'){
+      const actual=Number(m.qa), target=Number(targets.qa);
+      if(actual>=target) return 'good';
+      if(actual>=target-2) return 'near';
+      return 'low';
+    }
+    if(key==='aht'){
+      const actual=Number(m.ahtSeconds), target=Number(targets.ahtSeconds);
+      if(actual>0 && actual<=target) return 'good';
+      if(actual>target && actual<=target+30) return 'near';
+      return 'low';
+    }
+    return 'low';
+  }
+
+  function renderAverageMetrics(team){
+    const container=document.getElementById('averageMetrics');
+    if(!container) return;
+    const metrics=[
+      {key:'csat',label:'CSAT',value:`${oneDecimal(team.metrics.csat)}%`,target:`Target: ${Math.round(config.targets.csat)}%`},
+      {key:'qa',label:'QA',value:`${oneDecimal(team.metrics.qa)}%`,target:`Target: ${Math.round(config.targets.qa)}%`},
+      {key:'aht',label:'AHT',value:formatAHT(team.metrics.ahtSeconds),target:`Target: ${formatAHT(config.targets.ahtSeconds)}`}
+    ];
+    container.innerHTML=metrics.map(metric=>{
+      const status=averageMetricStatus(team,metric.key);
+      const statusLabel=status==='good'?'ON TARGET':status==='near'?'NEAR TARGET':'BELOW TARGET';
+      return `<div class="average-metric ${status}">
+        <div class="average-metric-top">
+          <span class="average-metric-label">${metric.label} average</span>
+          <span class="average-metric-status">${statusLabel}</span>
+        </div>
+        <div class="average-metric-value">${metric.value}</div>
+        <div class="average-metric-target">${metric.target}</div>
+      </div>`;
+    }).join('');
+  }
+
   function updateSelectedDetails(){
     const team=teams.find(t=>t.id===selectedId);
     if(!team) return;
@@ -1328,6 +1388,8 @@
     requestAnimationFrame(()=>meter.style.width=team.score+'%');
 
     [25,50,75,100].forEach(m=>document.getElementById('m'+m).classList.toggle('done',team.score>=m));
+
+    renderAverageMetrics(team);
 
     document.getElementById('targetNote').textContent=`Targets: CSAT ${Math.round(config.targets.csat)}% · QA ${Math.round(config.targets.qa)}% · AHT ${formatAHT(config.targets.ahtSeconds)}. Meeting the target earns 100 points for that metric; overall performance is capped at 100%.`;
 
